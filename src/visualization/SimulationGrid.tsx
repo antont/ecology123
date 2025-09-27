@@ -183,7 +183,11 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     setStats(newStats)
     
     // Add to population data for charting
-    setPopulationData(prev => [...prev, newStats])
+    setPopulationData(prev => {
+      const newData = [...prev, newStats]
+      console.log('Population data updated:', newStats, 'Total data points:', newData.length)
+      return newData
+    })
   }
 
   const stepSimulation = () => {
@@ -220,12 +224,13 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
           if (!simulation.isPaused()) {
             simulation.step()
             lastStepTime.current = currentTime
+            // Only update stats when a step actually occurs
+            updateStats(simulation)
           }
         }
         
         // Always update display (smooth animation)
         drawGrid()
-        updateStats(simulation)
       }
       
       animationRef.current = requestAnimationFrame(animate)
