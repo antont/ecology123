@@ -21,10 +21,6 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
 }) => {
   // Keep only the most recent data points for performance
   const displayData = data.slice(-maxDataPoints)
-  
-  // Debug logging
-  console.log('PopulationChart received data:', data.length, 'points')
-  console.log('Display data:', displayData.slice(-5)) // Show last 5 points
 
   return (
     <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 h-full">

@@ -183,11 +183,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     setStats(newStats)
     
     // Add to population data for charting
-    setPopulationData(prev => {
-      const newData = [...prev, newStats]
-      console.log('Population data updated:', newStats, 'Total data points:', newData.length)
-      return newData
-    })
+    setPopulationData(prev => [...prev, newStats])
   }
 
   const stepSimulation = () => {
