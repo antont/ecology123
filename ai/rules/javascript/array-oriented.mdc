@@ -1,0 +1,274 @@
+# Array-Oriented Programming
+
+Act as a top-tier software engineer with expertise in array-oriented programming, functional programming, and performance optimization. Apply modern game engine patterns and data-oriented design principles.
+
+## Core Principles
+
+### Array-First Thinking
+- Process data in batches, not individual items
+- Use array operations (`map`, `filter`, `reduce`, `forEach`) for bulk processing
+- Minimize individual object iterations
+- Prefer vectorized operations over scalar operations
+
+### Entity-Component System Patterns
+- Group entities by component type for processing
+- Process all entities of the same type together
+- Use batch operations for related computations
+- Separate data from behavior
+
+### Performance Optimization
+- Calculate shared values once, apply to all
+- Use spatial partitioning for proximity queries
+- Minimize function calls and object creation
+- Leverage CPU cache locality
+
+## Array-Oriented Patterns
+
+### Batch Processing
+```typescript
+// ❌ Inefficient: Individual processing
+entities.forEach(entity => {
+  entity.update()
+  entity.render()
+  entity.collide()
+})
+
+// ✅ Efficient: Batch processing
+const entities = getEntitiesByType('enemy')
+entities.forEach(e => e.age++)           // Batch age
+processMovement(entities)                // Batch movement
+processCollisions(entities)              // Batch collisions
+```
+
+### Shared Calculations
+```typescript
+// ❌ Inefficient: Recalculate per entity
+entities.forEach(entity => {
+  const modifier = calculateModifier(entity.type, season, temperature)
+  entity.growthRate *= modifier
+})
+
+// ✅ Efficient: Calculate once, apply to all
+const seasonalModifier = getSeasonalModifier(season)
+const temperatureModifier = getTemperatureModifier(temperature)
+entities.forEach(entity => {
+  entity.growthRate *= seasonalModifier * temperatureModifier
+})
+```
+
+### Functional Composition
+```typescript
+// ❌ Inefficient: Multiple passes
+const alive = entities.filter(e => e.isAlive)
+const hungry = alive.filter(e => e.hunger > threshold)
+const nearby = hungry.filter(e => distance(e, target) < radius)
+
+// ✅ Efficient: Single pass with composition
+const processable = entities
+  .filter(e => e.isAlive && e.hunger > threshold)
+  .filter(e => distance(e, target) < radius)
+  .forEach(e => processEntity(e))
+```
+
+### Spatial Operations
+```typescript
+// ❌ Inefficient: Nested loops for proximity
+entities.forEach(entity => {
+  entities.forEach(other => {
+    if (distance(entity, other) < radius) {
+      processInteraction(entity, other)
+    }
+  })
+})
+
+// ✅ Efficient: Spatial partitioning
+const spatialGrid = createSpatialGrid(entities, cellSize)
+entities.forEach(entity => {
+  const nearby = spatialGrid.getNearby(entity.position, radius)
+  nearby.forEach(other => processInteraction(entity, other))
+})
+```
+
+## Data Structure Patterns
+
+### Component Arrays
+```typescript
+// ❌ Inefficient: Mixed data
+interface Entity {
+  id: string
+  position: { x: number; y: number }
+  velocity: { x: number; y: number }
+  health: number
+  // ... many more properties
+}
+
+// ✅ Efficient: Component arrays
+interface World {
+  positions: Array<{ x: number; y: number }>
+  velocities: Array<{ x: number; y: number }>
+  health: number[]
+  // ... separate arrays for each component
+}
+```
+
+### Batch Operations
+```typescript
+// ❌ Inefficient: Individual updates
+entities.forEach(entity => {
+  entity.position.x += entity.velocity.x * deltaTime
+  entity.position.y += entity.velocity.y * deltaTime
+})
+
+// ✅ Efficient: Vectorized updates
+const positions = entities.map(e => e.position)
+const velocities = entities.map(e => e.velocity)
+positions.forEach((pos, i) => {
+  pos.x += velocities[i].x * deltaTime
+  pos.y += velocities[i].y * deltaTime
+})
+```
+
+## Performance Guidelines
+
+### Memory Efficiency
+- Use typed arrays for numeric data
+- Minimize object creation in hot paths
+- Reuse arrays and objects when possible
+- Prefer primitive types over objects
+
+### CPU Efficiency
+- Process related data together
+- Use SIMD operations when available
+- Minimize branching in tight loops
+- Cache frequently accessed values
+
+### Algorithm Efficiency
+- Use O(n) algorithms over O(n²) when possible
+- Leverage spatial data structures
+- Batch similar operations
+- Use parallel processing for independent operations
+
+## Common Anti-Patterns to Avoid
+
+### Individual Processing
+```typescript
+// ❌ Don't do this
+for (const entity of entities) {
+  if (entity.type === 'grass') {
+    entity.grow()
+  } else if (entity.type === 'sheep') {
+    entity.move()
+  }
+}
+
+// ✅ Do this instead
+const grass = entities.filter(e => e.type === 'grass')
+const sheep = entities.filter(e => e.type === 'sheep')
+processGrassBatch(grass)
+processSheepBatch(sheep)
+```
+
+### Repeated Calculations
+```typescript
+// ❌ Don't do this
+entities.forEach(entity => {
+  const modifier = Math.sin(entity.angle) * entity.speed
+  entity.velocity.x = modifier * Math.cos(entity.angle)
+  entity.velocity.y = modifier * Math.sin(entity.angle)
+})
+
+// ✅ Do this instead
+const angles = entities.map(e => e.angle)
+const speeds = entities.map(e => e.speed)
+const modifiers = angles.map(angle => Math.sin(angle))
+entities.forEach((entity, i) => {
+  const modifier = modifiers[i] * speeds[i]
+  entity.velocity.x = modifier * Math.cos(angles[i])
+  entity.velocity.y = modifier * Math.sin(angles[i])
+})
+```
+
+### Nested Loops
+```typescript
+// ❌ Don't do this
+entities.forEach(entity => {
+  entities.forEach(other => {
+    if (entity !== other && distance(entity, other) < threshold) {
+      processCollision(entity, other)
+    }
+  })
+})
+
+// ✅ Do this instead
+const spatialGrid = createSpatialGrid(entities)
+entities.forEach(entity => {
+  const nearby = spatialGrid.getNearby(entity.position, threshold)
+  nearby.forEach(other => processCollision(entity, other))
+})
+```
+
+## Testing Array-Oriented Code
+
+### Batch Testing
+```typescript
+describe('Batch Processing', () => {
+  it('should process all entities of same type together', () => {
+    const entities = createTestEntities(100)
+    const result = processBatch(entities)
+    
+    expect(result).toHaveLength(100)
+    expect(result.every(e => e.processed)).toBe(true)
+  })
+})
+```
+
+### Performance Testing
+```typescript
+describe('Performance', () => {
+  it('should process large batches efficiently', () => {
+    const largeBatch = createTestEntities(10000)
+    const start = performance.now()
+    
+    processBatch(largeBatch)
+    
+    const duration = performance.now() - start
+    expect(duration).toBeLessThan(100) // Should complete in <100ms
+  })
+})
+```
+
+## When to Use Array-Oriented Patterns
+
+### Use When:
+- Processing large datasets
+- Performance is critical
+- Operations can be batched
+- Data has spatial relationships
+- Building game engines or simulations
+
+### Don't Use When:
+- Code clarity is more important than performance
+- Data is small and simple
+- Operations are inherently sequential
+- Memory usage is more critical than CPU
+
+## Integration with Existing Patterns
+
+### Functional Programming
+- Combine with `map`, `filter`, `reduce`
+- Use function composition for complex operations
+- Prefer pure functions for batch operations
+
+### Object-Oriented Programming
+- Use classes for data organization
+- Implement batch methods on classes
+- Separate data from behavior
+
+### Reactive Programming
+- Use observables for data streams
+- Batch operations in reactive pipelines
+- Leverage backpressure for large datasets
+
+---
+
+*This guide ensures efficient, scalable code that follows modern game engine and data science best practices.*

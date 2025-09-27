@@ -1,0 +1,262 @@
+/**
+ * World class manages the 2D grid and world state for the ecological simulation
+ */
+
+import { WorldConfig } from '../config/WorldConfig'
+import { 
+  WorldState, 
+  WorldCell, 
+  Season, 
+  Grass, 
+  Sheep, 
+  Wolf,
+  Organism 
+} from '../types/SimulationTypes'
+
+export class World {
+  private state: WorldState
+  private config: WorldConfig
+
+  constructor(config: WorldConfig) {
+    this.config = config
+    this.state = this.initializeWorld()
+  }
+
+  private initializeWorld(): WorldState {
+    const cells: WorldCell[][] = []
+    
+    // Initialize empty grid
+    for (let x = 0; x < this.config.width; x++) {
+      cells[x] = []
+      for (let y = 0; y < this.config.height; y++) {
+        cells[x][y] = {
+          x,
+          y,
+          temperature: 20, // Default temperature
+          season: Season.SPRING
+        }
+      }
+    }
+
+    return {
+      width: this.config.width,
+      height: this.config.height,
+      cells,
+      currentStep: 0,
+      season: Season.SPRING,
+      temperature: 20,
+      statistics: {
+        totalSteps: 0,
+        grassCount: 0,
+        sheepCount: 0,
+        wolfCount: 0,
+        totalEnergy: 0,
+        averageGrassDensity: 0,
+        averageSheepEnergy: 0,
+        averageWolfEnergy: 0,
+        extinctionEvents: [],
+        populationHistory: []
+      }
+    }
+  }
+
+  public getWidth(): number {
+    return this.state.width
+  }
+
+  public getHeight(): number {
+    return this.state.height
+  }
+
+  public getCells(): WorldCell[][] {
+    return this.state.cells
+  }
+
+  public getCell(x: number, y: number): WorldCell | null {
+    if (!this.isValidPosition(x, y)) {
+      return null
+    }
+    return this.state.cells[x][y]
+  }
+
+  public getSeason(): Season {
+    return this.state.season
+  }
+
+  public getTemperature(): number {
+    return this.state.temperature
+  }
+
+  public getCurrentStep(): number {
+    return this.state.currentStep
+  }
+
+  public getState(): WorldState {
+    return { ...this.state }
+  }
+
+  public setCellContent(x: number, y: number, content: Partial<WorldCell>): boolean {
+    if (!this.isValidPosition(x, y)) {
+      return false
+    }
+
+    const cell = this.state.cells[x][y]
+    
+    // Update cell content
+    if (content.grass !== undefined) {
+      cell.grass = content.grass
+    }
+    if (content.sheep !== undefined) {
+      cell.sheep = content.sheep
+    }
+    if (content.wolf !== undefined) {
+      cell.wolf = content.wolf
+    }
+    if (content.temperature !== undefined) {
+      cell.temperature = content.temperature
+    }
+    if (content.season !== undefined) {
+      cell.season = content.season
+    }
+
+    return true
+  }
+
+  public clearCellContent(x: number, y: number): boolean {
+    if (!this.isValidPosition(x, y)) {
+      return false
+    }
+
+    const cell = this.state.cells[x][y]
+    delete cell.grass
+    delete cell.sheep
+    delete cell.wolf
+
+    return true
+  }
+
+  public incrementStep(): void {
+    this.state.currentStep++
+    this.state.statistics.totalSteps++
+    
+    // Update season based on step count
+    this.updateSeason()
+    
+    // Update temperature based on season
+    this.updateTemperature()
+    
+    // Update all cells with current season and temperature
+    this.updateAllCells()
+  }
+
+  public getOrganismsByType(type: 'grass' | 'sheep' | 'wolf'): Organism[] {
+    const organisms: Organism[] = []
+    
+    for (let x = 0; x < this.state.width; x++) {
+      for (let y = 0; y < this.state.height; y++) {
+        const cell = this.state.cells[x][y]
+        
+        if (type === 'grass' && cell.grass) {
+          organisms.push(cell.grass)
+        } else if (type === 'sheep' && cell.sheep) {
+          organisms.push(cell.sheep)
+        } else if (type === 'wolf' && cell.wolf) {
+          organisms.push(cell.wolf)
+        }
+      }
+    }
+    
+    return organisms
+  }
+
+  public updateStatistics(): void {
+    const grass = this.getOrganismsByType('grass') as Grass[]
+    const sheep = this.getOrganismsByType('sheep') as Sheep[]
+    const wolves = this.getOrganismsByType('wolf') as Wolf[]
+    
+    this.state.statistics.grassCount = grass.length
+    this.state.statistics.sheepCount = sheep.length
+    this.state.statistics.wolfCount = wolves.length
+    
+    // Calculate total energy
+    const totalEnergy = [...grass, ...sheep, ...wolves]
+      .reduce((sum, org) => sum + org.energy, 0)
+    this.state.statistics.totalEnergy = totalEnergy
+    
+    // Calculate average grass density
+    if (grass.length > 0) {
+      const totalDensity = grass.reduce((sum, g) => sum + g.density, 0)
+      this.state.statistics.averageGrassDensity = totalDensity / grass.length
+    } else {
+      this.state.statistics.averageGrassDensity = 0
+    }
+    
+    // Calculate average sheep energy
+    if (sheep.length > 0) {
+      const totalSheepEnergy = sheep.reduce((sum, s) => sum + s.energy, 0)
+      this.state.statistics.averageSheepEnergy = totalSheepEnergy / sheep.length
+    } else {
+      this.state.statistics.averageSheepEnergy = 0
+    }
+    
+    // Calculate average wolf energy
+    if (wolves.length > 0) {
+      const totalWolfEnergy = wolves.reduce((sum, w) => sum + w.energy, 0)
+      this.state.statistics.averageWolfEnergy = totalWolfEnergy / wolves.length
+    } else {
+      this.state.statistics.averageWolfEnergy = 0
+    }
+  }
+
+  private isValidPosition(x: number, y: number): boolean {
+    return x >= 0 && x < this.state.width && y >= 0 && y < this.state.height
+  }
+
+  private updateSeason(): void {
+    const seasonLength = this.config.world.seasonLength
+    const step = this.state.currentStep
+    
+    if (step < seasonLength) {
+      this.state.season = Season.SPRING
+    } else if (step < seasonLength * 2) {
+      this.state.season = Season.SUMMER
+    } else if (step < seasonLength * 3) {
+      this.state.season = Season.AUTUMN
+    } else if (step < seasonLength * 4) {
+      this.state.season = Season.WINTER
+    } else {
+      // Reset to spring after full year
+      this.state.season = Season.SPRING
+    }
+  }
+
+  private updateTemperature(): void {
+    const baseTemp = 20
+    const season = this.state.season
+    
+    switch (season) {
+      case Season.SPRING:
+        this.state.temperature = baseTemp + 5
+        break
+      case Season.SUMMER:
+        this.state.temperature = baseTemp + 15
+        break
+      case Season.AUTUMN:
+        this.state.temperature = baseTemp + 5
+        break
+      case Season.WINTER:
+        this.state.temperature = baseTemp - 10
+        break
+    }
+  }
+
+  private updateAllCells(): void {
+    for (let x = 0; x < this.state.width; x++) {
+      for (let y = 0; y < this.state.height; y++) {
+        const cell = this.state.cells[x][y]
+        cell.season = this.state.season
+        cell.temperature = this.state.temperature
+      }
+    }
+  }
+}

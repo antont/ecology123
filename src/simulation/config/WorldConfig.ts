@@ -1,0 +1,98 @@
+/**
+ * World Configuration for Ecological Simulation
+ * 
+ * This configuration defines all parameters for the three-level food chain simulation:
+ * Grass → Sheep → Wolves
+ * 
+ * Parameters are based on ecological literature and optimized for a 50x50 grid.
+ */
+
+export const WORLD_CONFIG = {
+  // Grid dimensions
+  width: 50,
+  height: 50,
+  
+  // Simulation timing
+  stepDuration: 60000, // 1 minute in milliseconds
+  
+  // Initial populations (optimized for 50x50 grid)
+  initialGrassCoverage: 0.7, // 70% of cells start with grass
+  initialSheepCount: 75,      // ~3% of total cells
+  initialWolfCount: 10,       // ~0.4% of total cells
+  
+  // Grass parameters
+  grass: {
+    growthRate: 0.1,           // Probability of growth per cell per step
+    maxDensity: 1.0,           // Maximum grass density per cell
+    consumptionRate: 0.3,      // Amount consumed when eaten by sheep
+    spreadingRadius: 1,        // Cells within this radius can be colonized
+    seasonalGrowth: true,      // Enable seasonal growth patterns
+    winterGrowthRate: 0.05,    // Reduced growth in winter
+    summerGrowthRate: 0.15,    // Increased growth in summer
+  },
+  
+  // Sheep parameters
+  sheep: {
+    movementRange: 2,          // Maximum cells sheep can move per step
+    hungerThreshold: 4,        // Steps before sheep must eat
+    reproductionRate: 0.05,    // Probability of reproduction per step when well-fed
+    reproductionThreshold: 0.8, // Minimum health required for reproduction
+    lifespan: 75,              // Maximum lifespan in steps
+    energyPerGrass: 0.2,       // Energy gained per grass consumed
+    energyPerStep: 0.1,        // Energy lost per step
+    flockingTendency: 0.3,     // Tendency to move toward other sheep
+    grazingEfficiency: 0.8,    // Efficiency of finding grass
+  },
+  
+  // Wolf parameters
+  wolf: {
+    movementRange: 3,          // Maximum cells wolves can move per step
+    hungerThreshold: 6,        // Steps before wolf must eat
+    reproductionRate: 0.02,    // Probability of reproduction per step when well-fed
+    reproductionThreshold: 0.9, // Minimum health required for reproduction
+    lifespan: 120,             // Maximum lifespan in steps
+    energyPerSheep: 0.5,       // Energy gained per sheep consumed
+    energyPerStep: 0.15,       // Energy lost per step
+    huntingRadius: 5,          // Radius for detecting sheep
+    packHuntingBonus: 0.2,     // Bonus when hunting near other wolves
+    territorialBehavior: true, // Enable territorial behavior
+    territorySize: 8,          // Size of wolf territory
+  },
+  
+  // World parameters
+  world: {
+    enableSeasons: true,       // Enable seasonal changes
+    seasonLength: 150,         // Steps per season
+    temperatureEffect: 0.1,    // Effect of temperature on growth
+    diseaseOutbreak: false,    // Enable disease outbreaks
+    diseaseProbability: 0.001, // Probability of disease per step
+    migrationEnabled: false,   // Enable animal migration
+  },
+  
+  // Visualization parameters
+  visualization: {
+    cellSize: 12,              // Size of each cell in pixels
+    showEnergy: false,         // Show energy levels
+    showTerritories: false,    // Show wolf territories
+    showPaths: false,          // Show movement paths
+    animationSpeed: 1.0,       // Animation speed multiplier
+    colorScheme: 'natural',    // Color scheme for organisms
+  },
+  
+  // Debug parameters
+  debug: {
+    logLevel: 'info',          // Logging level (debug, info, warn, error)
+    showDebugInfo: false,      // Show debug information
+    pauseOnExtinction: true,   // Pause simulation if species goes extinct
+    saveStatistics: true,      // Save simulation statistics
+  },
+} as const;
+
+// Type definitions for configuration
+export type WorldConfig = typeof WORLD_CONFIG;
+export type GrassConfig = typeof WORLD_CONFIG.grass;
+export type SheepConfig = typeof WORLD_CONFIG.sheep;
+export type WolfConfig = typeof WORLD_CONFIG.wolf;
+export type WorldParams = typeof WORLD_CONFIG.world;
+export type VisualizationConfig = typeof WORLD_CONFIG.visualization;
+export type DebugConfig = typeof WORLD_CONFIG.debug;
