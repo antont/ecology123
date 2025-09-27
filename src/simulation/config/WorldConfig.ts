@@ -18,7 +18,7 @@ export const WORLD_CONFIG = {
   // Initial populations (optimized for 50x50 grid)
   initialGrassCoverage: 0.8, // 80% of cells start with grass (increased for survival)
   initialSheepCount: 75,      // ~3% of total cells
-  initialWolfCount: 10,       // ~0.4% of total cells
+  initialWolfCount: 12,       // ~0.5% of total cells (increased for better survival)
   
   // Grass parameters
   grass: {
@@ -73,14 +73,14 @@ export const WORLD_CONFIG = {
   // Wolf parameters (ecologically realistic)
   wolf: {
     movementRange: 3,          // Maximum cells wolves can move per step
-    hungerThreshold: 10,       // Steps before wolf must eat (can go days without food)
-    reproductionRate: 0.02,    // Probability of reproduction per step when well-fed
-    reproductionThreshold: 0.8, // Minimum health required for reproduction
+    hungerThreshold: 15,       // Steps before wolf must eat (increased survival time)
+    reproductionRate: 0.03,    // Probability of reproduction per step when well-fed (increased)
+    reproductionThreshold: 0.7, // Minimum health required for reproduction (lowered)
     lifespan: 150,             // Maximum lifespan in steps
-    energyPerSheep: 1.2,       // Energy gained per sheep consumed (large meals)
-    energyPerStep: 0.03,       // Energy lost per step (low due to infrequent feeding)
-    huntingRadius: 5,          // Radius for detecting sheep (reduced for balance)
-    packHuntingBonus: 0.2,     // Bonus when hunting near other wolves
+    energyPerSheep: 1.5,       // Energy gained per sheep consumed (increased reward)
+    energyPerStep: 0.025,      // Energy lost per step (reduced consumption)
+    huntingRadius: 6,          // Radius for detecting sheep (increased hunting range)
+    packHuntingBonus: 0.3,     // Bonus when hunting near other wolves (increased cooperation)
     territorialBehavior: true, // Enable territorial behavior
     territorySize: 8,          // Size of wolf territory
     

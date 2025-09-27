@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { World } from './World'
 import { WORLD_CONFIG } from '../config/WorldConfig'
-import { Season, Direction } from '../types/SimulationTypes'
+import { Season, Direction, Sheep } from '../types/SimulationTypes'
 import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('World', () => {
@@ -129,7 +129,7 @@ describe('World', () => {
     world.setCellContent(x1, y1, { sheep: sheep1 })
     world.setCellContent(x2, y2, { sheep: sheep2 })
     
-    const sheep = world.getOrganismsByType('sheep')
+    const sheep = world.getOrganismsByType('sheep') as Sheep[]
     expect(sheep).toHaveLength(2)
     expect(sheep.map(s => s.id)).toContain('sheep-1')
     expect(sheep.map(s => s.id)).toContain('sheep-2')
