@@ -251,29 +251,29 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
   return (
     <div className="w-full h-screen flex flex-col">
       {/* Compact Statistics at the top */}
-      <div className="flex-shrink-0 mb-3">
-        <div className="grid grid-cols-4 gap-2 text-center">
-          <div className="bg-gray-100 p-2 rounded shadow-sm">
+      <div className="flex-shrink-0 mb-2">
+        <div className="grid grid-cols-4 gap-1 text-center">
+          <div className="bg-gray-100 p-1.5 rounded shadow-sm">
             <div className="text-xs text-gray-600">Step</div>
-            <div className="text-lg font-bold">{stats.step}</div>
+            <div className="text-sm font-bold">{stats.step}</div>
           </div>
-          <div className="bg-green-100 p-2 rounded shadow-sm">
+          <div className="bg-green-100 p-1.5 rounded shadow-sm">
             <div className="text-xs text-gray-600">Grass</div>
-            <div className="text-lg font-bold text-green-600">{stats.grass}</div>
+            <div className="text-sm font-bold text-green-600">{stats.grass}</div>
           </div>
-          <div className="bg-white p-2 rounded shadow-sm border">
+          <div className="bg-white p-1.5 rounded shadow-sm border">
             <div className="text-xs text-gray-600">Sheep</div>
-            <div className="text-lg font-bold text-gray-700">{stats.sheep}</div>
+            <div className="text-sm font-bold text-gray-700">{stats.sheep}</div>
           </div>
-          <div className="bg-red-100 p-2 rounded shadow-sm">
+          <div className="bg-red-100 p-1.5 rounded shadow-sm">
             <div className="text-xs text-gray-600">Wolves</div>
-            <div className="text-lg font-bold text-red-600">{stats.wolves}</div>
+            <div className="text-sm font-bold text-red-600">{stats.wolves}</div>
           </div>
         </div>
       </div>
 
       {/* Scalable Simulation Grid */}
-      <div className="flex-1 flex items-center justify-center mb-2 min-h-0" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+      <div className="flex-1 flex items-center justify-center mb-2 min-h-0" style={{ maxHeight: 'calc(100vh - 300px)' }}>
         <div className="relative w-full h-full flex items-center justify-center">
           <canvas
             ref={canvasRef}
