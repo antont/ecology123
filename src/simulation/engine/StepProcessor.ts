@@ -5,6 +5,7 @@
 
 import { World } from './World'
 import { WorldConfig } from '../config/WorldConfig'
+import { ReproductionProcessor } from './ReproductionProcessor'
 import { 
   Grass, 
   Sheep, 
@@ -17,10 +18,12 @@ import {
 export class StepProcessor {
   private world: World
   private config: WorldConfig
+  private reproductionProcessor: ReproductionProcessor
 
   constructor(world: World, config: WorldConfig) {
     this.world = world
     this.config = config
+    this.reproductionProcessor = new ReproductionProcessor(world, config)
   }
 
   public processStep(): void {
@@ -28,6 +31,9 @@ export class StepProcessor {
     this.processGrassBatch()
     this.processSheepBatch()
     this.processWolvesBatch()
+    
+    // Process reproduction for all species
+    this.reproductionProcessor.processReproduction()
     
     // Update world statistics
     this.world.updateStatistics()
@@ -433,7 +439,10 @@ export class StepProcessor {
       density: 0.1,
       growthStage: 'seed',
       lastGrazed: 0,
-      seasonalGrowth: 1.0
+      seasonalGrowth: 1.0,
+      seedProduction: 0,
+      lastSpreadStep: 0,
+      competitionStress: 0
     }
     
     this.world.setCellContent(x, y, { grass: newGrass })
@@ -456,7 +465,14 @@ export class StepProcessor {
           hunger: 0,
           reproductionCooldown: 10,
           lastDirection: Direction.NORTH,
-          grazingEfficiency: 0.8
+          grazingEfficiency: 0.8,
+          reproductionState: {
+            isPregnant: false,
+            gestationRemaining: 0,
+            expectedLitterSize: 0,
+            pregnancyEnergyCost: 0,
+            lastMatingStep: 0
+          }
         }
         
         this.world.setCellContent(offspringX, offspringY, { sheep: offspring })
@@ -481,7 +497,15 @@ export class StepProcessor {
           hunger: 0,
           reproductionCooldown: 15,
           lastDirection: Direction.NORTH,
-          huntingTarget: undefined
+          huntingTarget: undefined,
+          reproductionState: {
+            isPregnant: false,
+            gestationRemaining: 0,
+            expectedLitterSize: 0,
+            pregnancyEnergyCost: 0,
+            lastMatingStep: 0
+          },
+          packRole: 'omega'
         }
         
         this.world.setCellContent(offspringX, offspringY, { wolf: offspring })

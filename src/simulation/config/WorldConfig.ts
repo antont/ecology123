@@ -29,6 +29,17 @@ export const WORLD_CONFIG = {
     seasonalGrowth: true,      // Enable seasonal growth patterns
     winterGrowthRate: 0.05,    // Reduced growth in winter
     summerGrowthRate: 0.15,    // Increased growth in summer
+    
+    // Reproduction/spreading parameters
+    reproduction: {
+      minDensity: 0.6,         // Minimum density to produce seeds
+      spreadRadius: 2,         // How far seeds can spread
+      spreadProbability: 0.3,  // Chance per step to spread seeds
+      seasonalBonus: 1.5,      // Spring/summer spreading bonus
+      competitionRadius: 1,    // Competition with nearby grass
+      maxSeedsPerStep: 3,      // Maximum seeds produced per step
+      seedViability: 0.7,      // Probability seed becomes grass
+    }
   },
   
   // Sheep parameters (ecologically realistic)
@@ -42,6 +53,21 @@ export const WORLD_CONFIG = {
     energyPerStep: 0.04,       // Energy lost per step (further reduced)
     flockingTendency: 0.3,     // Tendency to move toward other sheep
     grazingEfficiency: 0.9,    // Efficiency of finding grass
+    
+    // Reproduction parameters
+    reproduction: {
+      minAge: 20,              // Sexual maturity age
+      maxAge: 80,              // Fertility decline age
+      minEnergy: 0.8,          // Minimum energy for reproduction
+      cooldownPeriod: 30,      // Steps between pregnancies
+      gestationPeriod: 25,     // Steps until birth
+      energyCost: 0.4,         // Energy cost during pregnancy
+      partnerProximity: 3,     // Cells to search for mate
+      litterSizeMin: 1,        // Minimum offspring
+      litterSizeMax: 2,        // Maximum offspring
+      juvenilePeriod: 15,      // Steps until independence
+      inheritanceVariation: 0.1, // Trait variation in offspring
+    }
   },
   
   // Wolf parameters (ecologically realistic)
@@ -57,6 +83,24 @@ export const WORLD_CONFIG = {
     packHuntingBonus: 0.2,     // Bonus when hunting near other wolves
     territorialBehavior: true, // Enable territorial behavior
     territorySize: 8,          // Size of wolf territory
+    
+    // Reproduction parameters
+    reproduction: {
+      minAge: 30,              // Later sexual maturity
+      maxAge: 120,             // Longer fertility period
+      minEnergy: 0.9,          // Must be very well-fed
+      cooldownPeriod: 50,      // Longer between litters
+      gestationPeriod: 15,     // Shorter gestation than sheep
+      energyCost: 0.6,         // Higher energy cost
+      packSizeMin: 2,          // Minimum pack size for breeding
+      packSizeMax: 6,          // Maximum optimal pack size
+      territoryRadius: 15,     // Required territory size
+      litterSizeMin: 2,        // Minimum offspring
+      litterSizeMax: 4,        // Maximum offspring
+      juvenilePeriod: 20,      // Longer dependency period
+      alphaBreedingOnly: true, // Only alpha pair breeds
+      inheritanceVariation: 0.15, // Higher trait variation
+    }
   },
   
   // World parameters

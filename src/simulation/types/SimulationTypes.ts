@@ -21,6 +21,34 @@ export interface Grass extends Organism {
   growthStage: 'seed' | 'sprout' | 'mature' | 'dying';
   lastGrazed: number;    // Step when last grazed
   seasonalGrowth: number; // Seasonal growth modifier
+  seedProduction: number; // Seeds available for spreading
+  lastSpreadStep: number; // When seeds were last spread
+  competitionStress: number; // Stress from nearby grass
+}
+
+// Reproduction-related interfaces
+export interface ReproductionState {
+  isPregnant: boolean;
+  gestationRemaining: number;
+  expectedLitterSize: number;
+  pregnancyEnergyCost: number;
+  mateId?: string;
+  lastMatingStep: number;
+}
+
+export interface OffspringTraits {
+  grazingEfficiency?: number;  // Sheep trait inheritance
+  huntingSkill?: number;       // Wolf trait inheritance
+  energyEfficiency: number;    // General fitness trait
+  maxLifespan: number;         // Inherited longevity
+}
+
+export interface Offspring {
+  parentId: string;
+  birthStep: number;
+  inheritedTraits: OffspringTraits;
+  juvenileStage: number;       // Steps until adult
+  dependencyPeriod: number;    // Steps needing parental care
 }
 
 // Sheep-specific interface
@@ -30,6 +58,8 @@ export interface Sheep extends Organism {
   flockId?: string;       // Optional flock identifier
   lastDirection: Direction;
   grazingEfficiency: number;
+  reproductionState: ReproductionState;
+  offspring?: Offspring[];     // Current offspring being cared for
 }
 
 // Wolf-specific interface
@@ -40,6 +70,10 @@ export interface Wolf extends Organism {
   territoryId?: string;   // Territory identifier
   lastDirection: Direction;
   huntingTarget?: string; // ID of targeted sheep
+  reproductionState: ReproductionState;
+  offspring?: Offspring[];     // Current offspring being cared for
+  packRole: 'alpha' | 'beta' | 'omega'; // Pack hierarchy
+  territoryCenter?: { x: number; y: number }; // Territory center
 }
 
 // Direction enum for movement
