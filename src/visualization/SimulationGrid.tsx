@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SimulationEngine } from '../simulation/engine/SimulationEngine'
 import { WORLD_CONFIG } from '../simulation/config/WorldConfig'
 import { WorldCell, Grass, Sheep, Wolf } from '../simulation/types/SimulationTypes'
+import { SpeedControl } from './SpeedControl'
 
 interface SimulationGridProps {
   width?: number
@@ -17,8 +18,12 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
   cellSize = 12
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const animationRef = useRef<number | null>(null)
+  const lastStepTime = useRef<number>(0)
+  
   const [simulation, setSimulation] = useState<SimulationEngine | null>(null)
   const [isRunning, setIsRunning] = useState(false)
+  const [speed, setSpeed] = useState(WORLD_CONFIG.speed.defaultSpeed)
   const [stats, setStats] = useState({
     step: 0,
     grass: 0,
@@ -188,23 +193,41 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     }
   }
 
-  // Animation loop that runs continuously
+  // Animation loop that runs continuously with speed control
   useEffect(() => {
     if (!simulation) return
 
-    const animate = () => {
+    const animate = (currentTime: number) => {
       if (simulation.isRunning()) {
-        if (!simulation.isPaused()) {
-          simulation.step()
+        // Calculate time-based stepping based on speed
+        const timeSinceLastStep = currentTime - lastStepTime.current
+        const stepInterval = 1000 / speed // Convert steps per second to milliseconds
+        
+        if (timeSinceLastStep >= stepInterval) {
+          if (!simulation.isPaused()) {
+            simulation.step()
+            lastStepTime.current = currentTime
+          }
         }
+        
+        // Always update display (smooth animation)
         drawGrid()
         updateStats(simulation)
       }
-      requestAnimationFrame(animate)
+      
+      animationRef.current = requestAnimationFrame(animate)
     }
     
-    animate()
-  }, [simulation])
+    // Start animation loop
+    animationRef.current = requestAnimationFrame(animate)
+    
+    // Cleanup
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [simulation, speed])
 
   const resetSimulation = () => {
     if (!simulation) return
@@ -215,12 +238,19 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     updateStats(simulation)
   }
 
+  const handleSpeedChange = (newSpeed: number) => {
+    setSpeed(newSpeed)
+    // Reset timing to avoid immediate step after speed change
+    lastStepTime.current = performance.now()
+  }
+
   useEffect(() => {
     drawGrid()
   }, [simulation])
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-6">
+      {/* Control Buttons */}
       <div className="flex space-x-4">
         <button
           onClick={toggleSimulation}
@@ -248,6 +278,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
         </button>
       </div>
       
+      {/* Statistics */}
       <div className="grid grid-cols-4 gap-4 text-center">
         <div className="bg-gray-100 p-2 rounded">
           <div className="text-sm text-gray-600">Step</div>
@@ -266,6 +297,13 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
           <div className="text-lg font-bold text-red-600">{stats.wolves}</div>
         </div>
       </div>
+      
+      {/* Speed Control */}
+      <SpeedControl
+        currentSpeed={speed}
+        onSpeedChange={handleSpeedChange}
+        isRunning={isRunning}
+      />
       
       <canvas
         ref={canvasRef}

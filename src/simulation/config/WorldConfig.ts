@@ -79,6 +79,21 @@ export const WORLD_CONFIG = {
     colorScheme: 'natural',    // Color scheme for organisms
   },
   
+  // Speed control parameters
+  speed: {
+    minSpeed: 0.1,             // Minimum steps per second (very slow)
+    maxSpeed: 60,              // Maximum steps per second (very fast)
+    defaultSpeed: 2,           // Default steps per second
+    presets: {
+      verySlow: 0.5,           // Very slow for detailed observation
+      slow: 1,                 // Slow for observation
+      normal: 2,               // Normal speed
+      fast: 5,                 // Fast simulation
+      veryFast: 10,            // Very fast simulation
+      unlimited: 60,           // Maximum speed
+    },
+  },
+  
   // Debug parameters
   debug: {
     logLevel: 'info',          // Logging level (debug, info, warn, error)
@@ -95,4 +110,5 @@ export type SheepConfig = typeof WORLD_CONFIG.sheep;
 export type WolfConfig = typeof WORLD_CONFIG.wolf;
 export type WorldParams = typeof WORLD_CONFIG.world;
 export type VisualizationConfig = typeof WORLD_CONFIG.visualization;
+export type SpeedConfig = typeof WORLD_CONFIG.speed;
 export type DebugConfig = typeof WORLD_CONFIG.debug;
