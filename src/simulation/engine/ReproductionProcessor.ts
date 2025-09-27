@@ -136,7 +136,9 @@ export class ReproductionProcessor {
   private attemptMating(organism: Sheep | Wolf, currentStep: number): void {
     const type = this.getOrganismType(organism)
     const config = this.config[type].reproduction
-    const proximity = type === 'sheep' ? config.partnerProximity : config.territoryRadius
+    const proximity = type === 'sheep' ? 
+      (config as typeof this.config.sheep.reproduction).partnerProximity : 
+      (config as typeof this.config.wolf.reproduction).territoryRadius
     
     // Find potential mates nearby
     const potentialMates = this.findNearbyMates(organism, proximity, type)

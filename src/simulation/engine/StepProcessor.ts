@@ -394,7 +394,7 @@ export class StepProcessor {
       if (deathCause) {
         org.isAlive = false
         this.world.clearCellContent(org.x, org.y)
-        this.world.recordDeath(org as Sheep | Wolf | Grass, deathCause, deathDetails)
+        this.world.recordDeath(org as unknown as Sheep | Wolf | Grass, deathCause, deathDetails)
         return false
       }
       

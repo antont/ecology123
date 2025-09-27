@@ -25,7 +25,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
   
   const [simulation, setSimulation] = useState<SimulationEngine | null>(null)
   const [isRunning, setIsRunning] = useState(false)
-  const [speed, setSpeed] = useState(WORLD_CONFIG.speed.defaultSpeed)
+  const [speed, setSpeed] = useState<number>(WORLD_CONFIG.speed.defaultSpeed)
   const [stats, setStats] = useState({
     step: 0,
     grass: 0,

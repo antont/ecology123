@@ -3,6 +3,7 @@ import { StepProcessor } from './StepProcessor'
 import { World } from './World'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { Grass, Sheep, Wolf, Direction } from '../types/SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('StepProcessor', () => {
   let stepProcessor: StepProcessor
@@ -19,18 +20,17 @@ describe('StepProcessor', () => {
 
   it('should process grass growth in batch', () => {
     // Create multiple grass cells
-    const grassArray: Grass[] = Array.from({ length: 5 }, (_, i) => ({
-      id: `grass-${i}`,
-      x: 10 + i,
-      y: 10,
-      energy: 0.5,
-      age: 0,
-      isAlive: true,
-      density: 0.3,
-      growthStage: 'sprout' as const,
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }))
+    const grassArray: Grass[] = Array.from({ length: 5 }, (_, i) => 
+      OrganismFactory.createGrass({
+        id: `grass-${i}`,
+        x: 10 + i,
+        y: 10,
+        energy: 0.5,
+        age: 0,
+        density: 0.3,
+        growthStage: 'sprout'
+      })
+    )
     
     grassArray.forEach(grass => {
       world.setCellContent(grass.x, grass.y, { grass })
@@ -52,18 +52,16 @@ describe('StepProcessor', () => {
 
   it('should process sheep movement in batch', () => {
     // Create multiple sheep
-    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => ({
-      id: `sheep-${i}`,
-      x: 10 + i * 2,
-      y: 10 + i * 2,
-      energy: 0.8,
-      age: 0,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
-      grazingEfficiency: 0.8
-    }))
+    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => 
+      OrganismFactory.createSheep({
+        id: `sheep-${i}`,
+        x: 10 + i * 2,
+        y: 10 + i * 2,
+        energy: 0.8,
+        age: 0,
+        grazingEfficiency: 0.8
+      })
+    )
     
     sheepArray.forEach(sheep => {
       world.setCellContent(sheep.x, sheep.y, { sheep })
