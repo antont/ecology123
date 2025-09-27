@@ -39,7 +39,7 @@ const mockCanvasContext = {
   strokeRect: vi.fn(),
 }
 
-HTMLCanvasElement.prototype.getContext = vi.fn(() => mockCanvasContext)
+HTMLCanvasElement.prototype.getContext = vi.fn(() => mockCanvasContext) as any
 
 describe('SimulationGrid', () => {
   beforeEach(() => {
@@ -117,7 +117,7 @@ describe('SimulationGrid', () => {
     for (let i = 1; i <= 3; i++) {
       stepCount = i
       // Trigger animation frame
-      fireEvent.animationFrame()
+      vi.advanceTimersByTime(100)
     }
     
     await waitFor(() => {

@@ -10,22 +10,20 @@ import {
   Season,
   SimulationActionType
 } from './SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('SimulationTypes', () => {
   describe('Organism interfaces', () => {
     it('should create valid Grass object', () => {
-      const grass: Grass = {
+      const grass = OrganismFactory.createGrass({
         id: 'grass-1',
         x: 10,
         y: 10,
         energy: 0.8,
         age: 5,
-        isAlive: true,
         density: 0.9,
-        growthStage: 'mature',
-        lastGrazed: 0,
-        seasonalGrowth: 1.0
-      }
+        growthStage: 'mature'
+      })
 
       expect(grass.id).toBe('grass-1')
       expect(grass.density).toBeGreaterThanOrEqual(0)
@@ -34,18 +32,14 @@ describe('SimulationTypes', () => {
     })
 
     it('should create valid Sheep object', () => {
-      const sheep: Sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: 'sheep-1',
         x: 15,
         y: 15,
         energy: 0.7,
         age: 10,
-        isAlive: true,
-        hunger: 2,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.8
-      }
+      })
 
       expect(sheep.id).toBe('sheep-1')
       expect(sheep.hunger).toBeGreaterThanOrEqual(0)
@@ -54,18 +48,13 @@ describe('SimulationTypes', () => {
     })
 
     it('should create valid Wolf object', () => {
-      const wolf: Wolf = {
+      const wolf = OrganismFactory.createWolf({
         id: 'wolf-1',
         x: 20,
         y: 20,
         energy: 0.9,
-        age: 15,
-        isAlive: true,
-        hunger: 1,
-        reproductionCooldown: 0,
-        lastDirection: Direction.SOUTH,
-        huntingTarget: 'sheep-1'
-      }
+        age: 15
+      })
 
       expect(wolf.id).toBe('wolf-1')
       expect(wolf.hunger).toBeGreaterThanOrEqual(0)
@@ -106,7 +95,17 @@ describe('SimulationTypes', () => {
           averageSheepEnergy: 0,
           averageWolfEnergy: 0,
           extinctionEvents: [],
-          populationHistory: []
+          populationHistory: [],
+          deathStats: {
+            totalDeaths: 0,
+            deathsByCause: {},
+            deathsByType: {},
+            recentDeaths: [],
+            step: 0,
+            sheepDeaths: 0,
+            wolfDeaths: 0,
+            grassDeaths: 0
+          }
         }
       }
 

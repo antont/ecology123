@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { SimulationEngine } from './SimulationEngine'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { Grass, Sheep, Wolf, Direction } from '../types/SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('Wolf Debug', () => {
   let simulationEngine: SimulationEngine
@@ -17,18 +18,14 @@ describe('Wolf Debug', () => {
     // Add grass
     for (let x = 10; x < 40; x += 2) {
       for (let y = 10; y < 40; y += 2) {
-        const grass: Grass = {
+        const grass = OrganismFactory.createGrass({
           id: `grass-${x}-${y}`,
           x,
           y,
           energy: 0.8,
-          age: 0,
-          isAlive: true,
           density: 0.8,
-          growthStage: 'mature',
-          lastGrazed: 0,
-          seasonalGrowth: 1.0
-        }
+          growthStage: 'mature'
+        })
         
         world.setCellContent(x, y, { grass })
       }
@@ -39,18 +36,14 @@ describe('Wolf Debug', () => {
       const x = 20 + (i % 3) * 5
       const y = 20 + Math.floor(i / 3) * 5
       
-      const sheep: Sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: `sheep-${i}`,
         x,
         y,
         energy: 0.9,
         age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.9
-      }
+      })
       
       world.setCellContent(x, y, { sheep })
     }
@@ -60,18 +53,13 @@ describe('Wolf Debug', () => {
       const x = 25 + i * 10
       const y = 25 + i * 5
       
-      const wolf: Wolf = {
+      const wolf = OrganismFactory.createWolf({
         id: `wolf-${i}`,
         x,
         y,
         energy: 0.9,
-        age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
-        huntingTarget: undefined
-      }
+        age: 0
+      })
       
       world.setCellContent(x, y, { wolf })
     }

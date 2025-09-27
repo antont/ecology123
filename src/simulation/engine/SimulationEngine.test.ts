@@ -47,31 +47,23 @@ describe('SimulationEngine', () => {
 
   it('should step simulation', () => {
     // Add some organisms to the world
-    const grass: Grass = {
+    const grass = OrganismFactory.createGrass({
       id: 'grass-1',
       x: 10,
       y: 10,
       energy: 0.8,
-      age: 0,
-      isAlive: true,
       density: 0.9,
-      growthStage: 'mature',
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }
+      growthStage: 'mature'
+    })
     
-    const sheep: Sheep = {
+    const sheep = OrganismFactory.createSheep({
       id: 'sheep-1',
       x: 15,
       y: 15,
       energy: 0.7,
       age: 0,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
       grazingEfficiency: 0.8
-    }
+    })
     
     simulationEngine.getWorld().setCellContent(10, 10, { grass })
     simulationEngine.getWorld().setCellContent(15, 15, { sheep })
@@ -107,18 +99,14 @@ describe('SimulationEngine', () => {
 
   it('should reset simulation', () => {
     // Add some organisms
-    const grass: Grass = {
+    const grass = OrganismFactory.createGrass({
       id: 'grass-1',
       x: 10,
       y: 10,
       energy: 0.8,
-      age: 0,
-      isAlive: true,
       density: 0.9,
-      growthStage: 'mature',
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }
+      growthStage: 'mature'
+    })
     
     simulationEngine.getWorld().setCellContent(10, 10, { grass })
     
@@ -138,18 +126,14 @@ describe('SimulationEngine', () => {
 
   it('should handle multiple steps', () => {
     // Add some organisms
-    const grass: Grass = {
+    const grass = OrganismFactory.createGrass({
       id: 'grass-1',
       x: 10,
       y: 10,
       energy: 0.8,
-      age: 0,
-      isAlive: true,
       density: 0.9,
-      growthStage: 'mature',
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }
+      growthStage: 'mature'
+    })
     
     simulationEngine.getWorld().setCellContent(10, 10, { grass })
     
@@ -163,31 +147,23 @@ describe('SimulationEngine', () => {
 
   it('should update statistics after each step', () => {
     // Add some organisms
-    const grass: Grass = {
+    const grass = OrganismFactory.createGrass({
       id: 'grass-1',
       x: 10,
       y: 10,
       energy: 0.8,
-      age: 0,
-      isAlive: true,
       density: 0.9,
-      growthStage: 'mature',
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }
+      growthStage: 'mature'
+    })
     
-    const sheep: Sheep = {
+    const sheep = OrganismFactory.createSheep({
       id: 'sheep-1',
       x: 15,
       y: 15,
       energy: 0.7,
       age: 0,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
       grazingEfficiency: 0.8
-    }
+    })
     
     simulationEngine.getWorld().setCellContent(10, 10, { grass })
     simulationEngine.getWorld().setCellContent(15, 15, { sheep })

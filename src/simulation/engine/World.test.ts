@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { World } from './World'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { Season, Direction } from '../types/SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('World', () => {
   let world: World
@@ -34,18 +35,14 @@ describe('World', () => {
     const y = 15
     
     // Test setting grass
-    const grass = {
+    const grass = OrganismFactory.createGrass({
       id: 'grass-1',
       x,
       y,
       energy: 0.8,
-      age: 0,
-      isAlive: true,
       density: 0.9,
-      growthStage: 'mature' as const,
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }
+      growthStage: 'mature'
+    })
     
     world.setCellContent(x, y, { grass })
     const cell = world.getCell(x, y)
@@ -70,18 +67,14 @@ describe('World', () => {
     
     // Set content first
     world.setCellContent(x, y, { 
-      grass: {
+      grass: OrganismFactory.createGrass({
         id: 'grass-1',
         x,
         y,
         energy: 0.8,
-        age: 0,
-        isAlive: true,
         density: 0.9,
-        growthStage: 'mature',
-        lastGrazed: 0,
-        seasonalGrowth: 1.0
-      }
+        growthStage: 'mature'
+      })
     })
     
     // Clear content
@@ -115,31 +108,23 @@ describe('World', () => {
     const x1 = 1, y1 = 1
     const x2 = 2, y2 = 2
     
-    const sheep1 = {
+    const sheep1 = OrganismFactory.createSheep({
       id: 'sheep-1',
       x: x1,
       y: y1,
       energy: 0.8,
       age: 0,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
       grazingEfficiency: 0.8
-    }
+    })
     
-    const sheep2 = {
+    const sheep2 = OrganismFactory.createSheep({
       id: 'sheep-2',
       x: x2,
       y: y2,
       energy: 0.7,
       age: 0,
-      isAlive: true,
-      hunger: 1,
-      reproductionCooldown: 0,
-      lastDirection: Direction.SOUTH,
       grazingEfficiency: 0.9
-    }
+    })
     
     world.setCellContent(x1, y1, { sheep: sheep1 })
     world.setCellContent(x2, y2, { sheep: sheep2 })

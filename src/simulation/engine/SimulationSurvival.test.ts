@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { SimulationEngine } from './SimulationEngine'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { Grass, Sheep, Wolf, Direction } from '../types/SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('Simulation Survival', () => {
   let simulationEngine: SimulationEngine
@@ -18,18 +19,14 @@ describe('Simulation Survival', () => {
     // Add dense grass coverage for better survival
     for (let x = 5; x < 45; x += 1) {
       for (let y = 5; y < 45; y += 1) {
-        const grass: Grass = {
+        const grass = OrganismFactory.createGrass({
           id: `grass-${x}-${y}`,
           x,
           y,
           energy: 0.8,
-          age: 0,
-          isAlive: true,
           density: 0.9, // Very high density grass
-          growthStage: 'mature',
-          lastGrazed: 0,
-          seasonalGrowth: 1.0
-        }
+          growthStage: 'mature'
+        })
         
         world.setCellContent(x, y, { grass })
       }
@@ -40,18 +37,14 @@ describe('Simulation Survival', () => {
       const x = 10 + (i % 5) * 8
       const y = 10 + Math.floor(i / 5) * 8
       
-      const sheep: Sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: `sheep-${i}`,
         x,
         y,
         energy: 0.9, // High energy
         age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.9
-      }
+      })
       
       world.setCellContent(x, y, { sheep })
     }
@@ -61,18 +54,13 @@ describe('Simulation Survival', () => {
       const x = 15 + i * 15
       const y = 15 + i * 10
       
-      const wolf: Wolf = {
+      const wolf = OrganismFactory.createWolf({
         id: `wolf-${i}`,
         x,
         y,
         energy: 0.9, // High energy
-        age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
-        huntingTarget: undefined
-      }
+        age: 0
+      })
       
       world.setCellContent(x, y, { wolf })
     }
