@@ -16,7 +16,7 @@ export const WORLD_CONFIG = {
   stepDuration: 60000, // 1 minute in milliseconds
   
   // Initial populations (optimized for 50x50 grid)
-  initialGrassCoverage: 0.7, // 70% of cells start with grass
+  initialGrassCoverage: 0.8, // 80% of cells start with grass (increased for survival)
   initialSheepCount: 75,      // ~3% of total cells
   initialWolfCount: 10,       // ~0.4% of total cells
   
@@ -24,7 +24,7 @@ export const WORLD_CONFIG = {
   grass: {
     growthRate: 0.1,           // Probability of growth per cell per step
     maxDensity: 1.0,           // Maximum grass density per cell
-    consumptionRate: 0.3,      // Amount consumed when eaten by sheep
+    consumptionRate: 0.5,      // Amount consumed when eaten by sheep (increased for survival)
     spreadingRadius: 1,        // Cells within this radius can be colonized
     seasonalGrowth: true,      // Enable seasonal growth patterns
     winterGrowthRate: 0.05,    // Reduced growth in winter
@@ -34,12 +34,12 @@ export const WORLD_CONFIG = {
   // Sheep parameters (ecologically realistic)
   sheep: {
     movementRange: 2,          // Maximum cells sheep can move per step
-    hungerThreshold: 3,        // Steps before sheep must eat (frequent feeding)
+    hungerThreshold: 8,        // Steps before sheep must eat (increased for stability)
     reproductionRate: 0.05,    // Probability of reproduction per step when well-fed
     reproductionThreshold: 0.7, // Minimum health required for reproduction
     lifespan: 100,             // Maximum lifespan in steps
-    energyPerGrass: 0.4,       // Energy gained per grass consumed (small, frequent meals)
-    energyPerStep: 0.08,       // Energy lost per step (higher due to frequent feeding needs)
+    energyPerGrass: 1.0,       // Energy gained per grass consumed (further increased)
+    energyPerStep: 0.04,       // Energy lost per step (further reduced)
     flockingTendency: 0.3,     // Tendency to move toward other sheep
     grazingEfficiency: 0.9,    // Efficiency of finding grass
   },
@@ -53,7 +53,7 @@ export const WORLD_CONFIG = {
     lifespan: 150,             // Maximum lifespan in steps
     energyPerSheep: 1.2,       // Energy gained per sheep consumed (large meals)
     energyPerStep: 0.03,       // Energy lost per step (low due to infrequent feeding)
-    huntingRadius: 8,          // Radius for detecting sheep
+    huntingRadius: 5,          // Radius for detecting sheep (reduced for balance)
     packHuntingBonus: 0.2,     // Bonus when hunting near other wolves
     territorialBehavior: true, // Enable territorial behavior
     territorySize: 8,          // Size of wolf territory

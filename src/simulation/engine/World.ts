@@ -10,7 +10,9 @@ import {
   Grass, 
   Sheep, 
   Wolf,
-  Organism 
+  Organism,
+  DeathRecord,
+  DeathStatistics
 } from '../types/SimulationTypes'
 
 export class World {
@@ -55,9 +57,73 @@ export class World {
         averageSheepEnergy: 0,
         averageWolfEnergy: 0,
         extinctionEvents: [],
-        populationHistory: []
+        populationHistory: [],
+        deathStats: this.initializeDeathStats()
       }
     }
+  }
+
+  private initializeDeathStats(): DeathStatistics {
+    return {
+      totalDeaths: 0,
+      deathsByCause: {},
+      deathsByType: {},
+      recentDeaths: [],
+      step: 0,
+      sheepDeaths: 0,
+      wolfDeaths: 0,
+      grassDeaths: 0
+    }
+  }
+
+  public recordDeath(organism: Organism, cause: DeathRecord['cause'], details?: string): void {
+    const deathRecord: DeathRecord = {
+      organismId: organism.id,
+      organismType: this.getOrganismType(organism),
+      cause,
+      step: this.state.currentStep,
+      energy: organism.energy,
+      age: organism.age,
+      x: organism.x,
+      y: organism.y,
+      details
+    }
+
+    // Add to recent deaths (keep last 50)
+    this.state.statistics.deathStats.recentDeaths.push(deathRecord)
+    if (this.state.statistics.deathStats.recentDeaths.length > 50) {
+      this.state.statistics.deathStats.recentDeaths.shift()
+    }
+
+    // Update counters
+    this.state.statistics.deathStats.totalDeaths++
+    this.state.statistics.deathStats.deathsByCause[cause] = 
+      (this.state.statistics.deathStats.deathsByCause[cause] || 0) + 1
+    this.state.statistics.deathStats.deathsByType[deathRecord.organismType] = 
+      (this.state.statistics.deathStats.deathsByType[deathRecord.organismType] || 0) + 1
+
+    // Update specific counters
+    if (deathRecord.organismType === 'sheep') {
+      this.state.statistics.deathStats.sheepDeaths++
+    } else if (deathRecord.organismType === 'wolf') {
+      this.state.statistics.deathStats.wolfDeaths++
+    } else if (deathRecord.organismType === 'grass') {
+      this.state.statistics.deathStats.grassDeaths++
+    }
+
+    // Log death for debugging
+    console.log(`💀 Death at step ${this.state.currentStep}: ${deathRecord.organismType} ${organism.id} died of ${cause} (energy: ${organism.energy.toFixed(2)}, age: ${organism.age})`)
+  }
+
+  private getOrganismType(organism: Organism): 'grass' | 'sheep' | 'wolf' {
+    if ('density' in organism) return 'grass'
+    if ('grazingEfficiency' in organism) return 'sheep'
+    if ('huntingTarget' in organism) return 'wolf'
+    return 'other' as any
+  }
+
+  public getDeathStatistics(): DeathStatistics {
+    return { ...this.state.statistics.deathStats }
   }
 
   public getWidth(): number {

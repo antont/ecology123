@@ -96,6 +96,7 @@ export interface SimulationStatistics {
   averageWolfEnergy: number;
   extinctionEvents: ExtinctionEvent[];
   populationHistory: PopulationSnapshot[];
+  deathStats: DeathStatistics;
 }
 
 // Extinction event
@@ -112,6 +113,30 @@ export interface PopulationSnapshot {
   sheepCount: number;
   wolfCount: number;
   averageEnergy: number;
+}
+
+// Death tracking interfaces
+export interface DeathRecord {
+  organismId: string;
+  organismType: 'grass' | 'sheep' | 'wolf';
+  cause: 'hunger' | 'hunting' | 'age' | 'starvation' | 'grazing' | 'other';
+  step: number;
+  energy: number;
+  age: number;
+  x: number;
+  y: number;
+  details?: string; // Additional context
+}
+
+export interface DeathStatistics {
+  totalDeaths: number;
+  deathsByCause: Record<string, number>;
+  deathsByType: Record<string, number>;
+  recentDeaths: DeathRecord[];
+  step: number;
+  sheepDeaths: number;
+  wolfDeaths: number;
+  grassDeaths: number;
 }
 
 // Simulation engine state

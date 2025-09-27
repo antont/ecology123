@@ -141,6 +141,7 @@ export class StepProcessor {
         s.hunger = 0
 
         if (cell.grass.density <= 0) {
+          this.world.recordDeath(cell.grass, 'grazing', `Grazed by sheep ${s.id}`)
           this.world.clearCellContent(s.x, s.y)
         }
         return
@@ -160,6 +161,7 @@ export class StepProcessor {
           s.hunger = 0
 
           if (targetCell.grass.density <= 0) {
+            this.world.recordDeath(targetCell.grass, 'grazing', `Grazed by sheep ${s.id}`)
             this.world.clearCellContent(target.x, target.y)
           }
         }
@@ -276,6 +278,7 @@ export class StepProcessor {
         
         if (distance <= 1) {
           // Eat the sheep
+          this.world.recordDeath(target, 'hunting', `Hunted by wolf ${w.id}`)
           this.world.clearCellContent(target.x, target.y)
           w.energy += this.config.wolf.energyPerSheep
           w.hunger = 0
@@ -368,13 +371,24 @@ export class StepProcessor {
     return organisms.filter(org => {
       if (!org.isAlive) return false
       
-      const shouldDie = org.age >= lifespan || 
-                       org.energy <= 0 || 
-                       org.hunger >= hungerThreshold * 2
+      let deathCause: 'hunger' | 'age' | 'starvation' | 'other' | null = null
+      let deathDetails = ''
       
-      if (shouldDie) {
+      if (org.age >= lifespan) {
+        deathCause = 'age'
+        deathDetails = `Reached max age of ${lifespan}`
+      } else if (org.energy <= 0) {
+        deathCause = 'starvation'
+        deathDetails = `Energy depleted (${org.energy.toFixed(2)})`
+      } else if (org.hunger >= hungerThreshold * 2) {
+        deathCause = 'hunger'
+        deathDetails = `Hunger threshold exceeded (${org.hunger}/${hungerThreshold * 2})`
+      }
+      
+      if (deathCause) {
         org.isAlive = false
         this.world.clearCellContent(org.x, org.y)
+        this.world.recordDeath(org as any, deathCause, deathDetails)
         return false
       }
       
