@@ -5,6 +5,7 @@ import { SimulationEngine } from '../simulation/engine/SimulationEngine'
 import { WORLD_CONFIG } from '../simulation/config/WorldConfig'
 import { WorldCell, Grass, Sheep, Wolf } from '../simulation/types/SimulationTypes'
 import styles from './SpeedControl.module.css'
+import { PopulationDashboard } from './PopulationDashboard'
 
 interface SimulationGridProps {
   width?: number
@@ -30,6 +31,12 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     sheep: 0,
     wolves: 0
   })
+  const [populationData, setPopulationData] = useState<Array<{
+    step: number
+    grass: number
+    sheep: number
+    wolves: number
+  }>>([])
 
   useEffect(() => {
     // Initialize simulation
@@ -165,12 +172,18 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
 
   const updateStats = (sim: SimulationEngine) => {
     const worldStats = sim.getStatistics()
-    setStats({
-      step: sim.getCurrentStep(),
+    const currentStep = sim.getCurrentStep()
+    const newStats = {
+      step: currentStep,
       grass: worldStats.grassCount,
       sheep: worldStats.sheepCount,
       wolves: worldStats.wolfCount
-    })
+    }
+    
+    setStats(newStats)
+    
+    // Add to population data for charting
+    setPopulationData(prev => [...prev, newStats])
   }
 
   const stepSimulation = () => {
@@ -236,6 +249,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     initializeWorld(simulation)
     drawGrid()
     updateStats(simulation)
+    setPopulationData([]) // Clear population data on reset
   }
 
   const handleSpeedChange = (newSpeed: number) => {
@@ -272,21 +286,32 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
         </div>
       </div>
 
-      {/* Scalable Simulation Grid */}
-      <div className="flex-1 flex items-center justify-center mb-2 min-h-0" style={{ maxHeight: 'calc(100vh - 300px)' }}>
-        <div className="relative w-full h-full flex items-center justify-center">
-          <canvas
-            ref={canvasRef}
-            width={width * cellSize}
-            height={height * cellSize}
-            className="border border-gray-300 rounded shadow-lg"
-            style={{ 
-              imageRendering: 'pixelated',
-              maxWidth: '100%',
-              maxHeight: '100%',
-              width: 'auto',
-              height: 'auto'
-            }}
+      {/* Main Content Area - Simulation Grid + Dashboard */}
+      <div className="flex-1 flex gap-4 mb-2 min-h-0" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+        {/* Simulation Grid */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="relative w-full h-full flex items-center justify-center">
+            <canvas
+              ref={canvasRef}
+              width={width * cellSize}
+              height={height * cellSize}
+              className="border border-gray-300 rounded shadow-lg"
+              style={{ 
+                imageRendering: 'pixelated',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                width: 'auto',
+                height: 'auto'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Population Dashboard */}
+        <div className="w-80 flex-shrink-0">
+          <PopulationDashboard 
+            data={populationData}
+            currentStats={stats}
           />
         </div>
       </div>
