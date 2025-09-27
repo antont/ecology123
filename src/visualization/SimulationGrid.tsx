@@ -185,19 +185,26 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
     } else {
       simulation.start()
       setIsRunning(true)
-      
-      // Start the animation loop
-      const animate = () => {
-        if (simulation.isRunning() && !simulation.isPaused()) {
-          simulation.step()
-          drawGrid()
-          updateStats(simulation)
-          requestAnimationFrame(animate)
-        }
-      }
-      animate()
     }
   }
+
+  // Animation loop that runs continuously
+  useEffect(() => {
+    if (!simulation) return
+
+    const animate = () => {
+      if (simulation.isRunning()) {
+        if (!simulation.isPaused()) {
+          simulation.step()
+        }
+        drawGrid()
+        updateStats(simulation)
+      }
+      requestAnimationFrame(animate)
+    }
+    
+    animate()
+  }, [simulation])
 
   const resetSimulation = () => {
     if (!simulation) return

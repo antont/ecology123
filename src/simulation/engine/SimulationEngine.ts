@@ -37,8 +37,8 @@ export class SimulationEngine {
     this.state.isRunning = true
     this.state.isPaused = false
 
-    // Start the simulation loop
-    this.startSimulationLoop()
+    // Don't start internal loop - let external code control timing
+    // this.startSimulationLoop()
   }
 
   public pause(): void {
@@ -47,7 +47,8 @@ export class SimulationEngine {
     }
 
     this.state.isPaused = true
-    this.stopSimulationLoop()
+    // Don't stop internal loop - external code controls timing
+    // this.stopSimulationLoop()
   }
 
   public resume(): void {
@@ -56,7 +57,8 @@ export class SimulationEngine {
     }
 
     this.state.isPaused = false
-    this.startSimulationLoop()
+    // Don't start internal loop - external code controls timing
+    // this.startSimulationLoop()
   }
 
   public stop(): void {
@@ -66,10 +68,7 @@ export class SimulationEngine {
   }
 
   public step(): void {
-    if (this.state.isRunning && !this.state.isPaused) {
-      return // Let the simulation loop handle steps
-    }
-
+    // Always process step when called externally
     this.processStep()
   }
 
