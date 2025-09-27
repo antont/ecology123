@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { SimulationEngine } from './SimulationEngine'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { Grass, Sheep, Wolf, Direction } from '../types/SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 describe('SimulationEngine', () => {
   let simulationEngine: SimulationEngine

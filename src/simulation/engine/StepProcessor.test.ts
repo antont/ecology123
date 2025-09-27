@@ -81,18 +81,15 @@ describe('StepProcessor', () => {
 
   it('should process wolf movement in batch', () => {
     // Create multiple wolves
-    const wolfArray: Wolf[] = Array.from({ length: 2 }, (_, i) => ({
-      id: `wolf-${i}`,
-      x: 15 + i * 3,
-      y: 15 + i * 3,
-      energy: 0.9,
-      age: 0,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.SOUTH,
-      huntingTarget: undefined
-    }))
+    const wolfArray: Wolf[] = Array.from({ length: 2 }, (_, i) => 
+      OrganismFactory.createWolf({
+        id: `wolf-${i}`,
+        x: 15 + i * 3,
+        y: 15 + i * 3,
+        energy: 0.9,
+        age: 0
+      })
+    )
     
     wolfArray.forEach(wolf => {
       world.setCellContent(wolf.x, wolf.y, { wolf })
@@ -116,31 +113,23 @@ describe('StepProcessor', () => {
       const x = 10 + i * 2
       const y = 10 + i * 2
       
-      const grass: Grass = {
+      const grass = OrganismFactory.createGrass({
         id: `grass-${i}`,
         x,
         y,
         energy: 0.8,
-        age: 0,
-        isAlive: true,
         density: 0.9,
-        growthStage: 'mature' as const,
-        lastGrazed: 0,
-        seasonalGrowth: 1.0
-      }
+        growthStage: 'mature'
+      })
       
-      const sheep: Sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: `sheep-${i}`,
         x,
         y,
         energy: 0.3,
         age: 0,
-        isAlive: true,
-        hunger: 5,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.8
-      }
+      })
       
       return { grass, sheep, x, y }
     })
@@ -171,31 +160,22 @@ describe('StepProcessor', () => {
       const x = 10 + i * 3
       const y = 10 + i * 3
       
-      const sheep: Sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: `sheep-${i}`,
         x,
         y,
         energy: 0.5,
         age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.8
-      }
+      })
       
-      const wolf: Wolf = {
+      const wolf = OrganismFactory.createWolf({
         id: `wolf-${i}`,
         x,
         y,
         energy: 0.3,
-        age: 0,
-        isAlive: true,
-        hunger: 7,
-        reproductionCooldown: 0,
-        lastDirection: Direction.SOUTH,
-        huntingTarget: `sheep-${i}`
-      }
+        age: 0
+      })
       
       return { sheep, wolf, x, y }
     })
@@ -221,18 +201,16 @@ describe('StepProcessor', () => {
 
   it('should process organism aging in batch', () => {
     // Create multiple old sheep
-    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => ({
-      id: `sheep-${i}`,
-      x: 10 + i * 2,
-      y: 10 + i * 2,
-      energy: 0.5,
-      age: 74,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
-      grazingEfficiency: 0.8
-    }))
+    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => 
+      OrganismFactory.createSheep({
+        id: `sheep-${i}`,
+        x: 10 + i * 2,
+        y: 10 + i * 2,
+        energy: 0.5,
+        age: 74,
+        grazingEfficiency: 0.8
+      })
+    )
     
     sheepArray.forEach(sheep => {
       world.setCellContent(sheep.x, sheep.y, { sheep })
@@ -250,18 +228,16 @@ describe('StepProcessor', () => {
 
   it('should process organism death from old age in batch', () => {
     // Create multiple very old sheep
-    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => ({
-      id: `sheep-${i}`,
-      x: 10 + i * 2,
-      y: 10 + i * 2,
-      energy: 0.5,
-      age: 75, // At lifespan
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
-      grazingEfficiency: 0.8
-    }))
+    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => 
+      OrganismFactory.createSheep({
+        id: `sheep-${i}`,
+        x: 10 + i * 2,
+        y: 10 + i * 2,
+        energy: 0.5,
+        age: 75, // At lifespan
+        grazingEfficiency: 0.8
+      })
+    )
     
     sheepArray.forEach(sheep => {
       world.setCellContent(sheep.x, sheep.y, { sheep })
@@ -277,18 +253,16 @@ describe('StepProcessor', () => {
 
   it('should process organism death from starvation in batch', () => {
     // Create multiple starving sheep
-    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => ({
-      id: `sheep-${i}`,
-      x: 10 + i * 2,
-      y: 10 + i * 2,
-      energy: 0.0,
-      age: 0,
-      isAlive: true,
-      hunger: 10,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
-      grazingEfficiency: 0.8
-    }))
+    const sheepArray: Sheep[] = Array.from({ length: 3 }, (_, i) => 
+      OrganismFactory.createSheep({
+        id: `sheep-${i}`,
+        x: 10 + i * 2,
+        y: 10 + i * 2,
+        energy: 0.0,
+        age: 0,
+        grazingEfficiency: 0.8
+      })
+    )
     
     sheepArray.forEach(sheep => {
       world.setCellContent(sheep.x, sheep.y, { sheep })
@@ -304,31 +278,27 @@ describe('StepProcessor', () => {
 
   it('should update world statistics after processing', () => {
     // Create some organisms
-    const grassArray: Grass[] = Array.from({ length: 3 }, (_, i) => ({
-      id: `grass-${i}`,
-      x: 10 + i,
-      y: 10,
-      energy: 0.8,
-      age: 0,
-      isAlive: true,
-      density: 0.9,
-      growthStage: 'mature' as const,
-      lastGrazed: 0,
-      seasonalGrowth: 1.0
-    }))
+    const grassArray: Grass[] = Array.from({ length: 3 }, (_, i) => 
+      OrganismFactory.createGrass({
+        id: `grass-${i}`,
+        x: 10 + i,
+        y: 10,
+        energy: 0.8,
+        density: 0.9,
+        growthStage: 'mature'
+      })
+    )
     
-    const sheepArray: Sheep[] = Array.from({ length: 2 }, (_, i) => ({
-      id: `sheep-${i}`,
-      x: 15 + i,
-      y: 15,
-      energy: 0.7,
-      age: 0,
-      isAlive: true,
-      hunger: 0,
-      reproductionCooldown: 0,
-      lastDirection: Direction.NORTH,
-      grazingEfficiency: 0.8
-    }))
+    const sheepArray: Sheep[] = Array.from({ length: 2 }, (_, i) => 
+      OrganismFactory.createSheep({
+        id: `sheep-${i}`,
+        x: 15 + i,
+        y: 15,
+        energy: 0.7,
+        age: 0,
+        grazingEfficiency: 0.8
+      })
+    )
     
     grassArray.forEach(grass => {
       world.setCellContent(grass.x, grass.y, { grass })

@@ -4,7 +4,8 @@
 
 import { SimulationEngine } from './SimulationEngine'
 import { WORLD_CONFIG } from '../config/WorldConfig'
-import { DeathStatistics } from '../types/SimulationTypes'
+import { DeathStatistics, Direction } from '../types/SimulationTypes'
+import { OrganismFactory } from '../utils/OrganismFactory'
 
 export interface SimulationAnalysis {
   finalStep: number;
@@ -48,18 +49,14 @@ export class HeadlessSimulationTest {
       const x = Math.floor(Math.random() * WORLD_CONFIG.width)
       const y = Math.floor(Math.random() * WORLD_CONFIG.height)
       
-      const grass = {
+      const grass = OrganismFactory.createGrass({
         id: `grass-${i}`,
         x,
         y,
         energy: 0.8,
-        age: 0,
-        isAlive: true,
         density: Math.random() * 0.8 + 0.2,
-        growthStage: 'mature' as const,
-        lastGrazed: 0,
-        seasonalGrowth: 1.0
-      }
+        growthStage: 'mature'
+      })
       
       world.setCellContent(x, y, { grass })
     }
@@ -69,18 +66,14 @@ export class HeadlessSimulationTest {
       const x = Math.floor(Math.random() * WORLD_CONFIG.width)
       const y = Math.floor(Math.random() * WORLD_CONFIG.height)
       
-      const sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: `sheep-${i}`,
         x,
         y,
         energy: 0.9, // Higher initial energy
         age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.8
-      }
+      })
       
       world.setCellContent(x, y, { sheep })
     }
@@ -90,18 +83,13 @@ export class HeadlessSimulationTest {
       const x = Math.floor(Math.random() * WORLD_CONFIG.width)
       const y = Math.floor(Math.random() * WORLD_CONFIG.height)
       
-      const wolf = {
+      const wolf = OrganismFactory.createWolf({
         id: `wolf-${i}`,
         x,
         y,
         energy: 0.9,
-        age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: Direction.NORTH,
-        huntingTarget: undefined
-      }
+        age: 0
+      })
       
       world.setCellContent(x, y, { wolf })
     }
@@ -121,7 +109,7 @@ export class HeadlessSimulationTest {
       
       const stats = this.simulation.getStatistics()
       this.populationHistory.push({
-        step: stats.step,
+        step: stats.totalSteps,
         grass: stats.grassCount,
         sheep: stats.sheepCount,
         wolves: stats.wolfCount
@@ -162,7 +150,7 @@ export class HeadlessSimulationTest {
     const deathStats = this.simulation.getWorld().getDeathStatistics()
     
     console.log('\n📈 Final Results:')
-    console.log(`Final Step: ${finalStats.step}`)
+    console.log(`Final Step: ${finalStats.totalSteps}`)
     console.log(`Final Populations: Grass=${finalStats.grassCount}, Sheep=${finalStats.sheepCount}, Wolves=${finalStats.wolfCount}`)
     console.log(`Total Deaths: ${deathStats.totalDeaths}`)
     console.log(`Sheep Deaths: ${deathStats.sheepDeaths}`)
@@ -180,7 +168,7 @@ export class HeadlessSimulationTest {
     })
     
     return {
-      finalStep: finalStats.step,
+      finalStep: finalStats.totalSteps,
       finalPopulations: {
         grass: finalStats.grassCount,
         sheep: finalStats.sheepCount,
