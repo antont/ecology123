@@ -273,13 +273,13 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
       </div>
 
       {/* Scalable Simulation Grid */}
-      <div className="flex-1 flex items-center justify-center mb-3 min-h-0">
-        <div className="relative max-w-full max-h-full">
+      <div className="flex-1 flex items-center justify-center mb-2 min-h-0" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="relative w-full h-full flex items-center justify-center">
           <canvas
             ref={canvasRef}
             width={width * cellSize}
             height={height * cellSize}
-            className="border border-gray-300 rounded shadow-lg max-w-full max-h-full object-contain"
+            className="border border-gray-300 rounded shadow-lg"
             style={{ 
               imageRendering: 'pixelated',
               maxWidth: '100%',
@@ -292,7 +292,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
       </div>
 
       {/* Compact Legend */}
-      <div className="flex-shrink-0 mb-3 text-xs text-gray-600 text-center">
+      <div className="flex-shrink-0 mb-2 text-xs text-gray-600 text-center">
         <span className="font-semibold">Legend:</span>
         <span className="ml-2">🟢 Grass (darker = denser) • ⚪ Sheep • 🔴 Wolves</span>
       </div>

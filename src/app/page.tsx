@@ -16,7 +16,7 @@ export default function Home() {
         <SimulationGrid 
           width={50} 
           height={50} 
-          cellSize={12}
+          cellSize={8}
         />
       </main>
       
