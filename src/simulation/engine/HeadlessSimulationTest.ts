@@ -5,7 +5,7 @@
 import { SimulationEngine } from './SimulationEngine'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { DeathStatistics, Direction } from '../types/SimulationTypes'
-import { OrganismFactory } from '../utils/OrganismFactory'
+import { WorldInitializer } from '../utils/WorldInitializer'
 
 export interface SimulationAnalysis {
   finalStep: number;
@@ -44,57 +44,8 @@ export class HeadlessSimulationTest {
   private initializeWorld(): void {
     const world = this.simulation.getWorld()
     
-    // Add more grass for better survival
-    for (let i = 0; i < 200; i++) {
-      const x = Math.floor(Math.random() * WORLD_CONFIG.width)
-      const y = Math.floor(Math.random() * WORLD_CONFIG.height)
-      
-      const grass = OrganismFactory.createGrass({
-        id: `grass-${i}`,
-        x,
-        y,
-        energy: 0.8,
-        density: Math.random() * 0.8 + 0.2,
-        growthStage: 'mature'
-      })
-      
-      world.setCellContent(x, y, { grass })
-    }
-    
-    // Add sheep
-    for (let i = 0; i < WORLD_CONFIG.initialSheepCount; i++) {
-      const x = Math.floor(Math.random() * WORLD_CONFIG.width)
-      const y = Math.floor(Math.random() * WORLD_CONFIG.height)
-      
-      const sheep = OrganismFactory.createSheep({
-        id: `sheep-${i}`,
-        x,
-        y,
-        energy: 0.9, // Higher initial energy
-        age: 0,
-        grazingEfficiency: 0.8
-      })
-      
-      world.setCellContent(x, y, { sheep })
-    }
-    
-    // Add wolves
-    for (let i = 0; i < WORLD_CONFIG.initialWolfCount; i++) {
-      const x = Math.floor(Math.random() * WORLD_CONFIG.width)
-      const y = Math.floor(Math.random() * WORLD_CONFIG.height)
-      
-      const wolf = OrganismFactory.createWolf({
-        id: `wolf-${i}`,
-        x,
-        y,
-        energy: 0.9,
-        age: 0
-      })
-      
-      world.setCellContent(x, y, { wolf })
-    }
-    
-    world.updateStatistics()
+    // Use centralized initialization with production config
+    WorldInitializer.createProductionEcosystem(world, WORLD_CONFIG)
   }
 
   public runAnalysis(): SimulationAnalysis {

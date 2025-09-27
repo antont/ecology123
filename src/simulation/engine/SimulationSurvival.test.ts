@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { SimulationEngine } from './SimulationEngine'
 import { WORLD_CONFIG } from '../config/WorldConfig'
 import { Grass, Sheep, Wolf, Direction } from '../types/SimulationTypes'
-import { OrganismFactory } from '../utils/OrganismFactory'
+import { WorldInitializer } from '../utils/WorldInitializer'
 
 describe('Simulation Survival', () => {
   let simulationEngine: SimulationEngine
@@ -15,57 +15,8 @@ describe('Simulation Survival', () => {
   const initializeStableEcosystem = (sim: SimulationEngine) => {
     const world = sim.getWorld()
     
-    // Create a more stable initial ecosystem
-    // Add dense grass coverage for better survival
-    for (let x = 5; x < 45; x += 1) {
-      for (let y = 5; y < 45; y += 1) {
-        const grass = OrganismFactory.createGrass({
-          id: `grass-${x}-${y}`,
-          x,
-          y,
-          energy: 0.8,
-          density: 0.9, // Very high density grass
-          growthStage: 'mature'
-        })
-        
-        world.setCellContent(x, y, { grass })
-      }
-    }
-    
-    // Add sheep with good energy and spacing
-    for (let i = 0; i < 15; i++) {
-      const x = 10 + (i % 5) * 8
-      const y = 10 + Math.floor(i / 5) * 8
-      
-      const sheep = OrganismFactory.createSheep({
-        id: `sheep-${i}`,
-        x,
-        y,
-        energy: 0.9, // High energy
-        age: 0,
-        grazingEfficiency: 0.9
-      })
-      
-      world.setCellContent(x, y, { sheep })
-    }
-    
-    // Add wolves with good energy and spacing
-    for (let i = 0; i < 3; i++) {
-      const x = 15 + i * 15
-      const y = 15 + i * 10
-      
-      const wolf = OrganismFactory.createWolf({
-        id: `wolf-${i}`,
-        x,
-        y,
-        energy: 0.9, // High energy
-        age: 0
-      })
-      
-      world.setCellContent(x, y, { wolf })
-    }
-    
-    world.updateStatistics()
+    // Use centralized stable ecosystem initialization
+    WorldInitializer.createStableTestEcosystem(world, WORLD_CONFIG)
   }
 
   it('should have animals survive until step 10', () => {

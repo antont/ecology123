@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SimulationEngine } from '../simulation/engine/SimulationEngine'
 import { WORLD_CONFIG } from '../simulation/config/WorldConfig'
 import { WorldCell, Grass, Sheep, Wolf } from '../simulation/types/SimulationTypes'
-import { OrganismFactory } from '../simulation/utils/OrganismFactory'
+import { WorldInitializer } from '../simulation/utils/WorldInitializer'
 import styles from './SpeedControl.module.css'
 import { PopulationDashboard } from './PopulationDashboard'
 
@@ -55,52 +55,10 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
   const initializeWorld = (sim: SimulationEngine) => {
     const world = sim.getWorld()
     
-    // Add some grass
-    for (let i = 0; i < 100; i++) {
-      const x = Math.floor(Math.random() * width)
-      const y = Math.floor(Math.random() * height)
-      
-      const grass = OrganismFactory.createGrass({
-        id: `grass-${i}`,
-        x,
-        y,
-        density: Math.random() * 0.8 + 0.2
-      })
-      
-      world.setCellContent(x, y, { grass })
-    }
+    // Use centralized initialization with production config
+    WorldInitializer.createProductionEcosystem(world, WORLD_CONFIG)
     
-    // Add some sheep
-    for (let i = 0; i < 20; i++) {
-      const x = Math.floor(Math.random() * width)
-      const y = Math.floor(Math.random() * height)
-      
-      const sheep = OrganismFactory.createSheep({
-        id: `sheep-${i}`,
-        x,
-        y,
-        energy: 0.8 // Higher energy to prevent immediate death
-      })
-      
-      world.setCellContent(x, y, { sheep })
-    }
-    
-    // Add some wolves
-    for (let i = 0; i < 5; i++) {
-      const x = Math.floor(Math.random() * width)
-      const y = Math.floor(Math.random() * height)
-      
-      const wolf = OrganismFactory.createWolf({
-        id: `wolf-${i}`,
-        x,
-        y
-      })
-      
-      world.setCellContent(x, y, { wolf })
-    }
-    
-    // Update statistics after initialization
-    world.updateStatistics()
+    // Update UI statistics
     updateStats(sim)
   }
 
