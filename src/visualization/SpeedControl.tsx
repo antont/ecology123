@@ -46,7 +46,7 @@ export const SpeedControl: React.FC<SpeedControlProps> = ({
     <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-semibold text-gray-800">Speed Control</h3>
-        <div className="text-sm text-gray-600">
+        <div className="text-lg font-bold text-blue-600">
           {getSpeedLabel(currentSpeed)}
         </div>
       </div>
@@ -57,7 +57,7 @@ export const SpeedControl: React.FC<SpeedControlProps> = ({
       </div>
 
       {/* Preset Buttons */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="grid grid-cols-2 gap-2 mb-4">
         <button
           onClick={() => handlePresetClick(presets.verySlow)}
           className={`px-3 py-2 text-xs rounded transition-colors ${
@@ -152,12 +152,9 @@ export const SpeedControl: React.FC<SpeedControlProps> = ({
         />
       </div>
 
-      {/* Current Speed Display */}
+      {/* Current Speed Details */}
       <div className="mt-3 text-center">
-        <div className="text-2xl font-bold text-blue-600">
-          {getSpeedLabel(currentSpeed)}
-        </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-sm text-gray-500">
           {currentSpeed.toFixed(1)} steps/second
         </div>
       </div>

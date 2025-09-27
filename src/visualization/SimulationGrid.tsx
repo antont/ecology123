@@ -249,76 +249,99 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
   }, [simulation])
 
   return (
-    <div className="flex flex-col items-center space-y-6">
-      {/* Control Buttons */}
-      <div className="flex space-x-4">
-        <button
-          onClick={toggleSimulation}
-          className={`px-4 py-2 rounded ${
-            isRunning 
-              ? 'bg-red-500 hover:bg-red-600' 
-              : 'bg-green-500 hover:bg-green-600'
-          } text-white font-semibold`}
-        >
-          {isRunning ? 'Pause' : 'Start'}
-        </button>
-        
-        <button
-          onClick={stepSimulation}
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded"
-        >
-          Step
-        </button>
-        
-        <button
-          onClick={resetSimulation}
-          className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded"
-        >
-          Reset
-        </button>
-      </div>
-      
-      {/* Statistics */}
-      <div className="grid grid-cols-4 gap-4 text-center">
-        <div className="bg-gray-100 p-2 rounded">
-          <div className="text-sm text-gray-600">Step</div>
-          <div className="text-lg font-bold">{stats.step}</div>
-        </div>
-        <div className="bg-green-100 p-2 rounded">
-          <div className="text-sm text-gray-600">Grass</div>
-          <div className="text-lg font-bold text-green-600">{stats.grass}</div>
-        </div>
-        <div className="bg-white p-2 rounded border">
-          <div className="text-sm text-gray-600">Sheep</div>
-          <div className="text-lg font-bold text-gray-700">{stats.sheep}</div>
-        </div>
-        <div className="bg-red-100 p-2 rounded">
-          <div className="text-sm text-gray-600">Wolves</div>
-          <div className="text-lg font-bold text-red-600">{stats.wolves}</div>
+    <div className="w-full max-w-6xl mx-auto">
+      {/* Statistics at the top */}
+      <div className="mb-6">
+        <div className="grid grid-cols-4 gap-4 text-center">
+          <div className="bg-gray-100 p-3 rounded-lg shadow-sm">
+            <div className="text-sm text-gray-600">Step</div>
+            <div className="text-xl font-bold">{stats.step}</div>
+          </div>
+          <div className="bg-green-100 p-3 rounded-lg shadow-sm">
+            <div className="text-sm text-gray-600">Grass</div>
+            <div className="text-xl font-bold text-green-600">{stats.grass}</div>
+          </div>
+          <div className="bg-white p-3 rounded-lg shadow-sm border">
+            <div className="text-sm text-gray-600">Sheep</div>
+            <div className="text-xl font-bold text-gray-700">{stats.sheep}</div>
+          </div>
+          <div className="bg-red-100 p-3 rounded-lg shadow-sm">
+            <div className="text-sm text-gray-600">Wolves</div>
+            <div className="text-xl font-bold text-red-600">{stats.wolves}</div>
+          </div>
         </div>
       </div>
-      
-      {/* Speed Control */}
-      <SpeedControl
-        currentSpeed={speed}
-        onSpeedChange={handleSpeedChange}
-        isRunning={isRunning}
-      />
-      
-      <canvas
-        ref={canvasRef}
-        width={width * cellSize}
-        height={height * cellSize}
-        className="border border-gray-300 rounded"
-        style={{ imageRendering: 'pixelated' }}
-      />
-      
-      <div className="text-sm text-gray-600 text-center max-w-md">
-        <p><strong>Legend:</strong></p>
-        <p>🟢 Green = Grass (darker = more dense)</p>
-        <p>⚪ White = Sheep</p>
-        <p>🔴 Red = Wolves</p>
-        <p>Click Start to begin the simulation, Step to advance one step, or Reset to restart.</p>
+
+      {/* Main simulation area */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Simulation Grid - Main content */}
+        <div className="flex-1 flex flex-col items-center">
+          <canvas
+            ref={canvasRef}
+            width={width * cellSize}
+            height={height * cellSize}
+            className="border border-gray-300 rounded-lg shadow-lg"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          
+          {/* Legend below the grid */}
+          <div className="mt-4 text-sm text-gray-600 text-center">
+            <p className="font-semibold mb-2">Legend:</p>
+            <p>🟢 Green = Grass (darker = more dense) • ⚪ White = Sheep • 🔴 Red = Wolves</p>
+          </div>
+        </div>
+
+        {/* Speed Control - Sidebar on wide screens */}
+        <div className="lg:w-80 flex-shrink-0">
+          <SpeedControl
+            currentSpeed={speed}
+            onSpeedChange={handleSpeedChange}
+            isRunning={isRunning}
+          />
+        </div>
+      </div>
+
+      {/* Video player style controls below the main content */}
+      <div className="mt-6 bg-gray-50 rounded-lg p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {/* Main control buttons */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleSimulation}
+              className={`px-6 py-3 rounded-lg font-semibold text-white transition-colors ${
+                isRunning 
+                  ? 'bg-red-500 hover:bg-red-600' 
+                  : 'bg-green-500 hover:bg-green-600'
+              }`}
+            >
+              {isRunning ? '⏸️ Pause' : '▶️ Start'}
+            </button>
+            
+            <button
+              onClick={stepSimulation}
+              className="px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
+            >
+              ⏭️ Step
+            </button>
+            
+            <button
+              onClick={resetSimulation}
+              className="px-4 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
+            >
+              🔄 Reset
+            </button>
+          </div>
+
+          {/* Speed display for mobile */}
+          <div className="lg:hidden text-center">
+            <div className="text-lg font-bold text-blue-600">
+              {speed < 1 ? `${speed.toFixed(1)}x` : speed >= 60 ? 'Unlimited' : `${Math.round(speed)}x`}
+            </div>
+            <div className="text-xs text-gray-500">
+              {speed.toFixed(1)} steps/second
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
