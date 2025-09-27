@@ -31,29 +31,29 @@ export const WORLD_CONFIG = {
     summerGrowthRate: 0.15,    // Increased growth in summer
   },
   
-  // Sheep parameters
+  // Sheep parameters (ecologically realistic)
   sheep: {
     movementRange: 2,          // Maximum cells sheep can move per step
-    hungerThreshold: 4,        // Steps before sheep must eat
+    hungerThreshold: 3,        // Steps before sheep must eat (frequent feeding)
     reproductionRate: 0.05,    // Probability of reproduction per step when well-fed
-    reproductionThreshold: 0.8, // Minimum health required for reproduction
-    lifespan: 75,              // Maximum lifespan in steps
-    energyPerGrass: 0.2,       // Energy gained per grass consumed
-    energyPerStep: 0.1,        // Energy lost per step
+    reproductionThreshold: 0.7, // Minimum health required for reproduction
+    lifespan: 100,             // Maximum lifespan in steps
+    energyPerGrass: 0.4,       // Energy gained per grass consumed (small, frequent meals)
+    energyPerStep: 0.08,       // Energy lost per step (higher due to frequent feeding needs)
     flockingTendency: 0.3,     // Tendency to move toward other sheep
-    grazingEfficiency: 0.8,    // Efficiency of finding grass
+    grazingEfficiency: 0.9,    // Efficiency of finding grass
   },
   
-  // Wolf parameters
+  // Wolf parameters (ecologically realistic)
   wolf: {
     movementRange: 3,          // Maximum cells wolves can move per step
-    hungerThreshold: 6,        // Steps before wolf must eat
+    hungerThreshold: 10,       // Steps before wolf must eat (can go days without food)
     reproductionRate: 0.02,    // Probability of reproduction per step when well-fed
-    reproductionThreshold: 0.9, // Minimum health required for reproduction
-    lifespan: 120,             // Maximum lifespan in steps
-    energyPerSheep: 0.5,       // Energy gained per sheep consumed
-    energyPerStep: 0.15,       // Energy lost per step
-    huntingRadius: 5,          // Radius for detecting sheep
+    reproductionThreshold: 0.8, // Minimum health required for reproduction
+    lifespan: 150,             // Maximum lifespan in steps
+    energyPerSheep: 1.2,       // Energy gained per sheep consumed (large meals)
+    energyPerStep: 0.03,       // Energy lost per step (low due to infrequent feeding)
+    huntingRadius: 8,          // Radius for detecting sheep
     packHuntingBonus: 0.2,     // Bonus when hunting near other wolves
     territorialBehavior: true, // Enable territorial behavior
     territorySize: 8,          // Size of wolf territory

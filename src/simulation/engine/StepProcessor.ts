@@ -130,18 +130,39 @@ export class StepProcessor {
 
     // Process eating for all hungry sheep
     hungrySheep.forEach(s => {
+      // First try to eat grass in current cell
       const cell = this.world.getCell(s.x, s.y)
-      if (!cell?.grass || cell.grass.density <= 0) return
+      if (cell?.grass && cell.grass.density > 0) {
+        const consumed = Math.min(this.config.grass.consumptionRate, cell.grass.density)
+        cell.grass.density -= consumed
+        cell.grass.lastGrazed = this.world.getCurrentStep()
+        
+        s.energy += consumed * this.config.sheep.energyPerGrass
+        s.hunger = 0
 
-      const consumed = Math.min(this.config.grass.consumptionRate, cell.grass.density)
-      cell.grass.density -= consumed
-      cell.grass.lastGrazed = this.world.getCurrentStep()
+        if (cell.grass.density <= 0) {
+          this.world.clearCellContent(s.x, s.y)
+        }
+        return
+      }
       
-      s.energy += consumed * this.config.sheep.energyPerGrass
-      s.hunger = 0
+      // If no grass in current cell, try to find grass nearby
+      const nearbyGrass = this.findNearbyOrganisms(s.x, s.y, 2, 'grass') as Grass[]
+      if (nearbyGrass.length > 0) {
+        const target = nearbyGrass[0]
+        const targetCell = this.world.getCell(target.x, target.y)
+        if (targetCell?.grass && targetCell.grass.density > 0) {
+          const consumed = Math.min(this.config.grass.consumptionRate, targetCell.grass.density)
+          targetCell.grass.density -= consumed
+          targetCell.grass.lastGrazed = this.world.getCurrentStep()
+          
+          s.energy += consumed * this.config.sheep.energyPerGrass
+          s.hunger = 0
 
-      if (cell.grass.density <= 0) {
-        this.world.clearCellContent(s.x, s.y)
+          if (targetCell.grass.density <= 0) {
+            this.world.clearCellContent(target.x, target.y)
+          }
+        }
       }
     })
   }
@@ -152,6 +173,28 @@ export class StepProcessor {
 
     // Process movement for all sheep
     sheep.forEach(s => {
+      // If sheep is hungry, try to find grass nearby
+      if (s.hunger >= this.config.sheep.hungerThreshold) {
+        const nearbyGrass = this.findNearbyOrganisms(s.x, s.y, 3, 'grass') as Grass[]
+        if (nearbyGrass.length > 0) {
+          // Move toward the nearest grass
+          const target = nearbyGrass[0]
+          const dx = Math.sign(target.x - s.x)
+          const dy = Math.sign(target.y - s.y)
+          const newX = s.x + dx
+          const newY = s.y + dy
+          
+          if (this.isValidPosition(newX, newY)) {
+            const targetCell = this.world.getCell(newX, newY)
+            if (targetCell && !targetCell.sheep && !targetCell.wolf) {
+              this.moveOrganism(s, newX, newY, 'sheep')
+              return
+            }
+          }
+        }
+      }
+      
+      // Random movement if not hungry or no grass found
       for (let i = 0; i < attempts; i++) {
         const dx = Math.floor(Math.random() * (movementRange * 2 + 1)) - movementRange
         const dy = Math.floor(Math.random() * (movementRange * 2 + 1)) - movementRange
@@ -241,6 +284,9 @@ export class StepProcessor {
           // Move toward target
           this.moveTowardTarget(w, target.x, target.y)
         }
+      } else {
+        // No sheep found nearby, clear hunting target
+        w.huntingTarget = undefined
       }
     })
   }
@@ -251,6 +297,28 @@ export class StepProcessor {
 
     // Process movement for wolves not hunting
     wolves.filter(w => !w.huntingTarget).forEach(w => {
+      // If wolf is getting hungry, try to find sheep nearby
+      if (w.hunger >= this.config.wolf.hungerThreshold * 0.7) {
+        const nearbySheep = this.findNearbyOrganisms(w.x, w.y, 5, 'sheep') as Sheep[]
+        if (nearbySheep.length > 0) {
+          // Move toward the nearest sheep
+          const target = nearbySheep[0]
+          const dx = Math.sign(target.x - w.x)
+          const dy = Math.sign(target.y - w.y)
+          const newX = w.x + dx
+          const newY = w.y + dy
+          
+          if (this.isValidPosition(newX, newY)) {
+            const targetCell = this.world.getCell(newX, newY)
+            if (targetCell && !targetCell.wolf) {
+              this.moveOrganism(w, newX, newY, 'wolf')
+              return
+            }
+          }
+        }
+      }
+      
+      // Random movement if not hunting or no sheep found
       for (let i = 0; i < attempts; i++) {
         const dx = Math.floor(Math.random() * (movementRange * 2 + 1)) - movementRange
         const dy = Math.floor(Math.random() * (movementRange * 2 + 1)) - movementRange
