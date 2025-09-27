@@ -119,7 +119,7 @@ export class World {
     if ('density' in organism) return 'grass'
     if ('grazingEfficiency' in organism) return 'sheep'
     if ('huntingTarget' in organism) return 'wolf'
-    return 'other' as any
+    return 'grass'
   }
 
   public getDeathStatistics(): DeathStatistics {

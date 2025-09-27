@@ -5,6 +5,8 @@
  * state, and data structures used throughout the application.
  */
 
+import type { WorldConfig } from '../config/WorldConfig'
+
 // Base organism interface
 export interface Organism {
   id: string;
@@ -180,7 +182,7 @@ export interface SimulationState {
   currentStep: number;
   speed: number;          // Steps per second
   world: WorldState;
-  config: any;            // WorldConfig type
+  config: WorldConfig;    // WorldConfig type
 }
 
 // Action types for Redux
@@ -234,7 +236,7 @@ export interface SetSpeedAction {
 
 export interface SetConfigAction {
   type: SimulationActionType.SET_CONFIG;
-  payload: any; // WorldConfig type
+  payload: WorldConfig;
 }
 
 // Union type for all actions
@@ -255,7 +257,7 @@ export interface SimulationEvent {
   organismId: string;
   organismType: 'grass' | 'sheep' | 'wolf';
   step: number;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 // Utility types

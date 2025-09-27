@@ -394,7 +394,7 @@ export class StepProcessor {
       if (deathCause) {
         org.isAlive = false
         this.world.clearCellContent(org.x, org.y)
-        this.world.recordDeath(org as any, deathCause, deathDetails)
+        this.world.recordDeath(org as Sheep | Wolf | Grass, deathCause, deathDetails)
         return false
       }
       
@@ -513,7 +513,7 @@ export class StepProcessor {
     }
   }
 
-  private moveOrganism(organism: any, newX: number, newY: number, type: 'sheep' | 'wolf'): void {
+  private moveOrganism(organism: Sheep | Wolf, newX: number, newY: number, type: 'sheep' | 'wolf'): void {
     const oldX = organism.x
     const oldY = organism.y
     
@@ -540,8 +540,8 @@ export class StepProcessor {
     }
   }
 
-  private findNearbyOrganisms(x: number, y: number, radius: number, type: 'grass' | 'sheep' | 'wolf'): any[] {
-    const organisms: any[] = []
+  private findNearbyOrganisms(x: number, y: number, radius: number, type: 'grass' | 'sheep' | 'wolf'): (Grass | Sheep | Wolf)[] {
+    const organisms: (Grass | Sheep | Wolf)[] = []
     
     for (let dx = -radius; dx <= radius; dx++) {
       for (let dy = -radius; dy <= radius; dy++) {

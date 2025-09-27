@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { SimulationEngine } from '../simulation/engine/SimulationEngine'
 import { WORLD_CONFIG } from '../simulation/config/WorldConfig'
 import { WorldCell, Grass, Sheep, Wolf } from '../simulation/types/SimulationTypes'
+import { OrganismFactory } from '../simulation/utils/OrganismFactory'
 import styles from './SpeedControl.module.css'
 import { PopulationDashboard } from './PopulationDashboard'
 
@@ -59,18 +60,12 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
       const x = Math.floor(Math.random() * width)
       const y = Math.floor(Math.random() * height)
       
-      const grass: Grass = {
+      const grass = OrganismFactory.createGrass({
         id: `grass-${i}`,
         x,
         y,
-        energy: 0.8,
-        age: 0,
-        isAlive: true,
-        density: Math.random() * 0.8 + 0.2,
-        growthStage: 'mature',
-        lastGrazed: 0,
-        seasonalGrowth: 1.0
-      }
+        density: Math.random() * 0.8 + 0.2
+      })
       
       world.setCellContent(x, y, { grass })
     }
@@ -80,18 +75,12 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
       const x = Math.floor(Math.random() * width)
       const y = Math.floor(Math.random() * height)
       
-      const sheep: Sheep = {
+      const sheep = OrganismFactory.createSheep({
         id: `sheep-${i}`,
         x,
         y,
-        energy: 0.8, // Higher energy to prevent immediate death
-        age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: 'north' as any,
-        grazingEfficiency: 0.8
-      }
+        energy: 0.8 // Higher energy to prevent immediate death
+      })
       
       world.setCellContent(x, y, { sheep })
     }
@@ -101,18 +90,11 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({
       const x = Math.floor(Math.random() * width)
       const y = Math.floor(Math.random() * height)
       
-      const wolf: Wolf = {
+      const wolf = OrganismFactory.createWolf({
         id: `wolf-${i}`,
         x,
-        y,
-        energy: 0.9,
-        age: 0,
-        isAlive: true,
-        hunger: 0,
-        reproductionCooldown: 0,
-        lastDirection: 'north' as any,
-        huntingTarget: undefined
-      }
+        y
+      })
       
       world.setCellContent(x, y, { wolf })
     }

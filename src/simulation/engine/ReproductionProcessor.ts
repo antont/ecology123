@@ -48,6 +48,17 @@ export class ReproductionProcessor {
     
     // Process pregnancies and births
     sheep.forEach(sheep => {
+      // Ensure reproductionState exists (for backward compatibility)
+      if (!sheep.reproductionState) {
+        sheep.reproductionState = {
+          isPregnant: false,
+          gestationRemaining: 0,
+          expectedLitterSize: 0,
+          pregnancyEnergyCost: 0,
+          lastMatingStep: 0
+        }
+      }
+      
       if (sheep.reproductionState.isPregnant) {
         this.processPregnancy(sheep, currentStep)
       } else if (this.canReproduce(sheep, 'sheep', currentStep)) {
@@ -61,6 +72,22 @@ export class ReproductionProcessor {
    */
   private processWolfReproduction(currentStep: number): void {
     const wolves = this.world.getOrganismsByType('wolf') as Wolf[]
+    
+    // Ensure all wolves have reproductionState and packRole
+    wolves.forEach(wolf => {
+      if (!wolf.reproductionState) {
+        wolf.reproductionState = {
+          isPregnant: false,
+          gestationRemaining: 0,
+          expectedLitterSize: 0,
+          pregnancyEnergyCost: 0,
+          lastMatingStep: 0
+        }
+      }
+      if (!wolf.packRole) {
+        wolf.packRole = 'omega'
+      }
+    })
     
     // Group wolves by pack
     const packs = this.groupWolvesByPack(wolves)
@@ -78,6 +105,11 @@ export class ReproductionProcessor {
     const grassPatches = this.world.getOrganismsByType('grass') as Grass[]
     
     grassPatches.forEach(grass => {
+      // Ensure grass has new fields (for backward compatibility)
+      if (grass.seedProduction === undefined) grass.seedProduction = 0
+      if (grass.lastSpreadStep === undefined) grass.lastSpreadStep = 0
+      if (grass.competitionStress === undefined) grass.competitionStress = 0
+      
       if (this.canSpreadSeeds(grass, currentStep)) {
         this.spreadSeeds(grass, currentStep)
       }

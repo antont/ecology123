@@ -78,7 +78,7 @@ export class HeadlessSimulationTest {
         isAlive: true,
         hunger: 0,
         reproductionCooldown: 0,
-        lastDirection: 'north' as any,
+        lastDirection: Direction.NORTH,
         grazingEfficiency: 0.8
       }
       
@@ -99,7 +99,7 @@ export class HeadlessSimulationTest {
         isAlive: true,
         hunger: 0,
         reproductionCooldown: 0,
-        lastDirection: 'north' as any,
+        lastDirection: Direction.NORTH,
         huntingTarget: undefined
       }
       
