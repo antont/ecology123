@@ -17,7 +17,7 @@ export const WORLD_CONFIG = {
   
   // Initial populations (optimized for 50x50 grid)
   initialGrassCoverage: 0.8, // 80% of cells start with grass (increased for survival)
-  initialSheepCount: 75,      // ~3% of total cells
+  initialSheepCount: 100,     // ~4% of total cells (increased to support more wolves)
   initialWolfCount: 20,       // ~0.8% of total cells (much higher starting population)
   
   // Grass parameters
@@ -79,7 +79,7 @@ export const WORLD_CONFIG = {
     lifespan: 150,             // Maximum lifespan in steps
     energyPerSheep: 2.5,       // Energy gained per sheep consumed (massive reward)
     energyPerStep: 0.015,      // Energy lost per step (minimal consumption)
-    huntingRadius: 7,          // Radius for detecting sheep (even better hunting range)
+    huntingRadius: 6,          // Radius for detecting sheep (balanced for sustainability)
     packHuntingBonus: 0.4,     // Bonus when hunting near other wolves (stronger cooperation)
     territorialBehavior: true, // Enable territorial behavior
     territorySize: 8,          // Size of wolf territory

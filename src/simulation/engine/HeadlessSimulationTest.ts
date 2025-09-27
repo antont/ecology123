@@ -62,7 +62,7 @@ export class HeadlessSimulationTest {
     }
     
     // Add sheep
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < WORLD_CONFIG.initialSheepCount; i++) {
       const x = Math.floor(Math.random() * WORLD_CONFIG.width)
       const y = Math.floor(Math.random() * WORLD_CONFIG.height)
       
@@ -79,7 +79,7 @@ export class HeadlessSimulationTest {
     }
     
     // Add wolves
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < WORLD_CONFIG.initialWolfCount; i++) {
       const x = Math.floor(Math.random() * WORLD_CONFIG.width)
       const y = Math.floor(Math.random() * WORLD_CONFIG.height)
       
