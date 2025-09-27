@@ -18,7 +18,7 @@ export const WORLD_CONFIG = {
   // Initial populations (optimized for 50x50 grid)
   initialGrassCoverage: 0.8, // 80% of cells start with grass (increased for survival)
   initialSheepCount: 75,      // ~3% of total cells
-  initialWolfCount: 15,       // ~0.6% of total cells (further increased for stability)
+  initialWolfCount: 20,       // ~0.8% of total cells (much higher starting population)
   
   // Grass parameters
   grass: {
@@ -73,12 +73,12 @@ export const WORLD_CONFIG = {
   // Wolf parameters (ecologically realistic)
   wolf: {
     movementRange: 3,          // Maximum cells wolves can move per step
-    hungerThreshold: 20,       // Steps before wolf must eat (further increased survival)
-    reproductionRate: 0.05,    // Probability of reproduction per step when well-fed (much higher)
-    reproductionThreshold: 0.6, // Minimum health required for reproduction (even lower)
+    hungerThreshold: 25,       // Steps before wolf must eat (maximum survival time)
+    reproductionRate: 0.08,    // Probability of reproduction per step when well-fed (very high)
+    reproductionThreshold: 0.5, // Minimum health required for reproduction (very low)
     lifespan: 150,             // Maximum lifespan in steps
-    energyPerSheep: 2.0,       // Energy gained per sheep consumed (much higher reward)
-    energyPerStep: 0.02,       // Energy lost per step (further reduced consumption)
+    energyPerSheep: 2.5,       // Energy gained per sheep consumed (massive reward)
+    energyPerStep: 0.015,      // Energy lost per step (minimal consumption)
     huntingRadius: 7,          // Radius for detecting sheep (even better hunting range)
     packHuntingBonus: 0.4,     // Bonus when hunting near other wolves (stronger cooperation)
     territorialBehavior: true, // Enable territorial behavior
@@ -86,12 +86,12 @@ export const WORLD_CONFIG = {
     
     // Reproduction parameters
     reproduction: {
-      minAge: 25,              // Earlier sexual maturity (reduced from 30)
+      minAge: 20,              // Very early sexual maturity (reduced from 25)
       maxAge: 120,             // Longer fertility period
-      minEnergy: 0.7,          // Lower energy requirement (reduced from 0.9)
-      cooldownPeriod: 30,      // Shorter between litters (reduced from 50)
-      gestationPeriod: 12,     // Even shorter gestation (reduced from 15)
-      energyCost: 0.4,         // Lower energy cost (reduced from 0.6)
+      minEnergy: 0.4,          // Very low energy requirement (reduced from 0.7)
+      cooldownPeriod: 20,      // Very short between litters (reduced from 30)
+      gestationPeriod: 8,      // Very short gestation (reduced from 12)
+      energyCost: 0.2,         // Very low energy cost (reduced from 0.4)
       packSizeMin: 1,          // Allow lone wolves to breed (reduced from 2)
       packSizeMax: 6,          // Maximum optimal pack size
       territoryRadius: 10,     // Smaller territory requirement (reduced from 15)
