@@ -18,7 +18,7 @@ export const WORLD_CONFIG = {
   // Initial populations (optimized for 50x50 grid)
   initialGrassCoverage: 0.8, // 80% of cells start with grass (increased for survival)
   initialSheepCount: 75,      // ~3% of total cells
-  initialWolfCount: 12,       // ~0.5% of total cells (increased for better survival)
+  initialWolfCount: 15,       // ~0.6% of total cells (further increased for stability)
   
   // Grass parameters
   grass: {
@@ -73,32 +73,32 @@ export const WORLD_CONFIG = {
   // Wolf parameters (ecologically realistic)
   wolf: {
     movementRange: 3,          // Maximum cells wolves can move per step
-    hungerThreshold: 15,       // Steps before wolf must eat (increased survival time)
-    reproductionRate: 0.03,    // Probability of reproduction per step when well-fed (increased)
-    reproductionThreshold: 0.7, // Minimum health required for reproduction (lowered)
+    hungerThreshold: 20,       // Steps before wolf must eat (further increased survival)
+    reproductionRate: 0.05,    // Probability of reproduction per step when well-fed (much higher)
+    reproductionThreshold: 0.6, // Minimum health required for reproduction (even lower)
     lifespan: 150,             // Maximum lifespan in steps
-    energyPerSheep: 1.5,       // Energy gained per sheep consumed (increased reward)
-    energyPerStep: 0.025,      // Energy lost per step (reduced consumption)
-    huntingRadius: 6,          // Radius for detecting sheep (increased hunting range)
-    packHuntingBonus: 0.3,     // Bonus when hunting near other wolves (increased cooperation)
+    energyPerSheep: 2.0,       // Energy gained per sheep consumed (much higher reward)
+    energyPerStep: 0.02,       // Energy lost per step (further reduced consumption)
+    huntingRadius: 7,          // Radius for detecting sheep (even better hunting range)
+    packHuntingBonus: 0.4,     // Bonus when hunting near other wolves (stronger cooperation)
     territorialBehavior: true, // Enable territorial behavior
     territorySize: 8,          // Size of wolf territory
     
     // Reproduction parameters
     reproduction: {
-      minAge: 30,              // Later sexual maturity
+      minAge: 25,              // Earlier sexual maturity (reduced from 30)
       maxAge: 120,             // Longer fertility period
-      minEnergy: 0.9,          // Must be very well-fed
-      cooldownPeriod: 50,      // Longer between litters
-      gestationPeriod: 15,     // Shorter gestation than sheep
-      energyCost: 0.6,         // Higher energy cost
-      packSizeMin: 2,          // Minimum pack size for breeding
+      minEnergy: 0.7,          // Lower energy requirement (reduced from 0.9)
+      cooldownPeriod: 30,      // Shorter between litters (reduced from 50)
+      gestationPeriod: 12,     // Even shorter gestation (reduced from 15)
+      energyCost: 0.4,         // Lower energy cost (reduced from 0.6)
+      packSizeMin: 1,          // Allow lone wolves to breed (reduced from 2)
       packSizeMax: 6,          // Maximum optimal pack size
-      territoryRadius: 15,     // Required territory size
+      territoryRadius: 10,     // Smaller territory requirement (reduced from 15)
       litterSizeMin: 2,        // Minimum offspring
-      litterSizeMax: 4,        // Maximum offspring
-      juvenilePeriod: 20,      // Longer dependency period
-      alphaBreedingOnly: true, // Only alpha pair breeds
+      litterSizeMax: 5,        // More offspring (increased from 4)
+      juvenilePeriod: 15,      // Shorter dependency (reduced from 20)
+      alphaBreedingOnly: false, // Allow all wolves to breed (changed from true)
       inheritanceVariation: 0.15, // Higher trait variation
     }
   },
