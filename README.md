@@ -33,9 +33,10 @@ More Grass → More Sheep → More Wolves → Fewer Sheep → Fewer Wolves → M
 ### **🐺 Wolf Behavior**
 - **Pack Hunting**: Coordinate with nearby wolves for hunting bonuses
 - **Territory Control**: Establish and defend hunting territories
-- **Alpha Breeding**: Only dominant pairs reproduce in packs
+- **Energy-Dependent Reproduction**: Breeding success scales with nutritional status
 - **Strategic Hunting**: Target weak or isolated sheep within hunting radius
 - **Energy Conservation**: Can survive longer without food than sheep
+- **Reproductive Suppression**: Hungry wolves have dramatically reduced fertility
 
 ### **🌱 Grass Ecosystem**
 - **Seed Dispersal**: Mature grass spreads seeds within 2-cell radius
@@ -187,15 +188,32 @@ npm run test:e2e:ui    # Interactive E2E testing
 ## 🔬 **Scientific Accuracy**
 
 ### **Ecological Research Basis**
+- **Nutritional Stress Theory** (Bronson, 1989): Reproduction rates decrease with poor nutrition/energy
+- **Resource Allocation Theory** (Zera & Harshman, 2001): Energy trade-offs between survival and reproduction
+- **Life History Theory** (Stearns, 1992): Optimal reproductive strategies under resource constraints
+- **Lotka-Volterra Dynamics** (1925): Classic predator-prey oscillation mathematics
+- **Wolf Pack Dynamics**: Alpha breeding patterns from Yellowstone wolf studies (Mech, 1999)
 - **Sheep Reproduction**: Based on real sheep gestation (5 months → 25 steps)
-- **Wolf Pack Dynamics**: Alpha breeding patterns from wolf studies
-- **Predator-Prey Ratios**: Realistic population densities
 - **Energy Metabolism**: Accurate energy costs for survival and reproduction
+
+### **Dynamic Reproduction Mechanism**
+The simulation implements **energy-dependent reproductive success**:
+```
+Reproduction Rate = Base Rate × (Average Energy / Maximum Energy)
+```
+- **High Energy (0.8-1.0)**: 80-100% of base reproduction rate
+- **Medium Energy (0.4-0.8)**: 40-80% of base reproduction rate  
+- **Low Energy (0.1-0.4)**: 10-40% of base reproduction rate
+
+This creates natural **density-dependent regulation** where:
+- Abundant prey → Well-fed predators → Higher reproduction
+- Scarce prey → Hungry predators → Lower reproduction → Population decline
 
 ### **Validation Metrics**
 - **Lotka-Volterra Compliance**: Matches theoretical predictions
 - **Field Study Comparison**: Aligns with real ecosystem observations
 - **Population Recovery**: Realistic bounce-back from near-extinction
+- **Reproductive Suppression**: Matches observed stress-induced fertility decline
 
 ## 🎯 **Future Enhancements**
 

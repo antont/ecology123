@@ -181,7 +181,26 @@ export class StepProcessor {
 
     // Process movement for all sheep
     sheep.forEach(s => {
-      // If sheep is hungry, try to find grass nearby
+      // First priority: flee from nearby wolves (survival instinct)
+      const nearbyWolves = this.findNearbyOrganisms(s.x, s.y, 6, 'wolf') as Wolf[]
+      if (nearbyWolves.length > 0) {
+        // Move away from the nearest wolf (use full movement range for escape)
+        const threat = nearbyWolves[0]
+        const dx = Math.sign(s.x - threat.x) // Opposite direction
+        const dy = Math.sign(s.y - threat.y) // Opposite direction
+        const newX = s.x + dx * movementRange
+        const newY = s.y + dy * movementRange
+        
+        if (this.isValidPosition(newX, newY)) {
+          const targetCell = this.world.getCell(newX, newY)
+          if (targetCell && !targetCell.sheep && !targetCell.wolf) {
+            this.moveOrganism(s, newX, newY, 'sheep')
+            return
+          }
+        }
+      }
+      
+      // Second priority: If sheep is hungry, try to find grass nearby
       if (s.hunger >= this.config.sheep.hungerThreshold) {
         const nearbyGrass = this.findNearbyOrganisms(s.x, s.y, 3, 'grass') as Grass[]
         if (nearbyGrass.length > 0) {
@@ -302,32 +321,38 @@ export class StepProcessor {
 
   private processWolfMovementBatch(wolves: Wolf[]): void {
     const movementRange = this.config.wolf.movementRange
+    const huntingRadius = this.config.wolf.huntingRadius
     const attempts = 3
 
     // Process movement for wolves not hunting
     wolves.filter(w => !w.huntingTarget).forEach(w => {
-      // If wolf is getting hungry, try to find sheep nearby
-      if (w.hunger >= this.config.wolf.hungerThreshold * 0.7) {
-        const nearbySheep = this.findNearbyOrganisms(w.x, w.y, 5, 'sheep') as Sheep[]
-        if (nearbySheep.length > 0) {
-          // Move toward the nearest sheep
-          const target = nearbySheep[0]
-          const dx = Math.sign(target.x - w.x)
-          const dy = Math.sign(target.y - w.y)
-          const newX = w.x + dx
-          const newY = w.y + dy
-          
-          if (this.isValidPosition(newX, newY)) {
-            const targetCell = this.world.getCell(newX, newY)
-            if (targetCell && !targetCell.wolf) {
-              this.moveOrganism(w, newX, newY, 'wolf')
-              return
-            }
+      // Wolves scout territory but hunt more selectively in massive world
+      // Only actively hunt when moderately hungry
+      const isHungry = w.hunger >= this.config.wolf.hungerThreshold * 0.4
+      const searchRadius = isHungry ? huntingRadius : Math.floor(huntingRadius * 0.7)
+      const nearbySheep = this.findNearbyOrganisms(w.x, w.y, searchRadius, 'sheep') as Sheep[]
+      
+      if (nearbySheep.length > 0) {
+        // Move toward the nearest sheep (keep original simple logic but use better detection)
+        const target = nearbySheep[0]
+        const dx = Math.sign(target.x - w.x)
+        const dy = Math.sign(target.y - w.y)
+        
+        // Use up to 4 cells of movement toward target (balanced for massive world)
+        const moveDistance = Math.min(4, movementRange)
+        const newX = w.x + dx * moveDistance
+        const newY = w.y + dy * moveDistance
+        
+        if (this.isValidPosition(newX, newY)) {
+          const targetCell = this.world.getCell(newX, newY)
+          if (targetCell && !targetCell.wolf) {
+            this.moveOrganism(w, newX, newY, 'wolf')
+            return
           }
         }
       }
       
-      // Random movement if not hunting or no sheep found
+      // Random movement if not hunting or no sheep found (keep original logic)
       for (let i = 0; i < attempts; i++) {
         const dx = Math.floor(Math.random() * (movementRange * 2 + 1)) - movementRange
         const dy = Math.floor(Math.random() * (movementRange * 2 + 1)) - movementRange

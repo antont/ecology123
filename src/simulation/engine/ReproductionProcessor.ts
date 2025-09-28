@@ -87,6 +87,13 @@ export class ReproductionProcessor {
       if (!wolf.packRole) {
         wolf.packRole = 'omega'
       }
+      
+      // Process pregnancies and births (CRITICAL FIX!)
+      if (wolf.reproductionState.isPregnant) {
+        this.processPregnancy(wolf, currentStep)
+      } else if (this.canReproduce(wolf, 'wolf', currentStep)) {
+        // Wolf can attempt mating (will be handled in pack reproduction)
+      }
     })
     
     // Group wolves by pack
@@ -169,25 +176,39 @@ export class ReproductionProcessor {
   }
 
   /**
-   * Initiate mating between two organisms
+   * Initiate mating between two organisms with energy-dependent success rate
+   * Based on Nutritional Stress Theory (Bronson, 1989) and Resource Allocation Theory (Zera & Harshman, 2001)
    */
   private initiateMating(organism1: Sheep | Wolf, organism2: Sheep | Wolf, currentStep: number): void {
     const type = this.getOrganismType(organism1)
-    const config = this.config[type].reproduction
+    const config = this.config[type]
+    
+    // Calculate energy-dependent reproduction probability
+    // Well-fed animals have higher reproductive success (ecological realism)
+    const avgEnergy = (organism1.energy + organism2.energy) / 2
+    // Use square root scaling to be less restrictive - even medium energy allows decent reproduction
+    const energyScalingFactor = Math.min(1.0, Math.sqrt(avgEnergy / 1.0))
+    const actualReproductionRate = config.reproductionRate * energyScalingFactor
+    
+    // Apply stochastic reproduction based on energy levels
+    if (Math.random() >= actualReproductionRate) {
+      return // Mating attempt failed due to poor condition
+    }
     
     // Determine which organism becomes pregnant (random choice)
     const pregnantOrganism = Math.random() < 0.5 ? organism1 : organism2
     const mate = pregnantOrganism === organism1 ? organism2 : organism1
     
     // Calculate litter size
-    const litterSize = Math.floor(Math.random() * (config.litterSizeMax - config.litterSizeMin + 1)) + config.litterSizeMin
+    const reproConfig = config.reproduction
+    const litterSize = Math.floor(Math.random() * (reproConfig.litterSizeMax - reproConfig.litterSizeMin + 1)) + reproConfig.litterSizeMin
     
     // Set pregnancy state
     pregnantOrganism.reproductionState = {
       isPregnant: true,
-      gestationRemaining: config.gestationPeriod,
+      gestationRemaining: reproConfig.gestationPeriod,
       expectedLitterSize: litterSize,
-      pregnancyEnergyCost: config.energyCost / config.gestationPeriod, // Energy cost per step
+      pregnancyEnergyCost: reproConfig.energyCost / reproConfig.gestationPeriod, // Energy cost per step
       mateId: mate.id,
       lastMatingStep: currentStep
     }
@@ -412,8 +433,8 @@ export class ReproductionProcessor {
   private processPackReproduction(pack: Wolf[], currentStep: number): void {
     const config = this.config.wolf.reproduction
     
-    // Only alpha pair can breed if alphaBreedingOnly is true
     if (config.alphaBreedingOnly) {
+      // Only alpha pair can breed
       const alphas = pack.filter(wolf => wolf.packRole === 'alpha')
       if (alphas.length >= 2) {
         const alphaMale = alphas[0]
@@ -422,6 +443,21 @@ export class ReproductionProcessor {
         if (this.canReproduce(alphaMale, 'wolf', currentStep) && 
             this.canReproduce(alphaFemale, 'wolf', currentStep)) {
           this.initiateMating(alphaMale, alphaFemale, currentStep)
+        }
+      }
+    } else {
+      // All wolves can breed - find eligible pairs
+      const eligibleWolves = pack.filter(wolf => this.canReproduce(wolf, 'wolf', currentStep))
+      
+      // Pair up wolves for breeding (simple pairing)
+      for (let i = 0; i < eligibleWolves.length - 1; i += 2) {
+        const wolf1 = eligibleWolves[i]
+        const wolf2 = eligibleWolves[i + 1]
+        
+        // Check if they're close enough to mate
+        const distance = Math.abs(wolf1.x - wolf2.x) + Math.abs(wolf1.y - wolf2.y)
+        if (distance <= config.territoryRadius) {
+          this.initiateMating(wolf1, wolf2, currentStep)
         }
       }
     }

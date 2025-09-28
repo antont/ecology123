@@ -15,8 +15,8 @@ interface SimulationGridProps {
 }
 
 export const SimulationGrid: React.FC<SimulationGridProps> = ({
-  width = 50,
-  height = 50,
+  width = WORLD_CONFIG.width,
+  height = WORLD_CONFIG.height,
   cellSize = 12
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)

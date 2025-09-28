@@ -3,8 +3,8 @@ import { WORLD_CONFIG } from './WorldConfig'
 
 describe('WorldConfig', () => {
   it('should have valid grid dimensions', () => {
-    expect(WORLD_CONFIG.width).toBe(50)
-    expect(WORLD_CONFIG.height).toBe(50)
+    expect(WORLD_CONFIG.width).toBe(100)
+    expect(WORLD_CONFIG.height).toBe(100)
     expect(WORLD_CONFIG.width).toBeGreaterThan(0)
     expect(WORLD_CONFIG.height).toBeGreaterThan(0)
   })
