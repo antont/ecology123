@@ -1,6 +1,6 @@
-# 🌿 Ecological Simulation: Predator-Prey Dynamics
+# 🌿 Ecological Simulation: Natural Boom-Bust Dynamics
 
-A dynamic ecosystem simulation featuring grass, sheep, and wolves with realistic reproduction mechanics and population oscillations. Built with Next.js, React, Redux, and TypeScript.
+A dynamic ecosystem simulation featuring emergent population oscillations through natural resource depletion and recovery cycles. Watch as grass, sheep, and wolves create realistic predator-prey dynamics without artificial mechanisms. Built with Next.js, React, Redux, and TypeScript.
 
 ![Ecosystem Simulation](https://img.shields.io/badge/Status-Active%20Development-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
@@ -14,29 +14,32 @@ This simulation demonstrates fundamental ecological principles through a three-l
 - **🐑 Sheep** (Primary Consumers): Graze grass, reproduce when well-fed, form flocks
 - **🐺 Wolves** (Secondary Consumers): Hunt sheep, form packs, territorial behavior
 
-The system exhibits **classic Lotka-Volterra predator-prey oscillations**, creating natural population cycles that demonstrate ecosystem stability through dynamic balance.
+The system exhibits **emergent boom-bust oscillations** that arise naturally from resource competition and energy-dependent reproduction, creating realistic population cycles without any artificial oscillation mechanisms.
 
 ## 🔬 **Ecological Features**
 
-### **Population Dynamics**
+### **Natural Boom-Bust Cycles**
 ```
-More Grass → More Sheep → More Wolves → Fewer Sheep → Fewer Wolves → More Grass
+Sheep Boom → Grass Depletion → Sheep Crash → Grass Recovery → Sheep Recovery
+    ↓             ↓                ↓            ↑             ↑
+Wolf Growth → Wolf Feeding → Wolf Starvation → Wolf Decline → Cycle Repeats
 ```
 
-### **🐑 Sheep Behavior**
-- **Intelligent Grazing**: Seek nearby grass patches for optimal nutrition
-- **Energy Management**: Must maintain energy above 0.8 to reproduce
-- **Reproduction**: 25-step gestation period with 1-2 offspring
-- **Genetic Inheritance**: Offspring inherit grazing efficiency with variation
-- **Flock Dynamics**: Tendency to move toward other sheep
+**Key Insight**: Oscillations emerge purely from organism behavior - no artificial timers or forced cycles!
 
-### **🐺 Wolf Behavior**
-- **Pack Hunting**: Coordinate with nearby wolves for hunting bonuses
-- **Territory Control**: Establish and defend hunting territories
-- **Energy-Dependent Reproduction**: Breeding success scales with nutritional status
-- **Strategic Hunting**: Target weak or isolated sheep within hunting radius
-- **Energy Conservation**: Can survive longer without food than sheep
-- **Reproductive Suppression**: Hungry wolves have dramatically reduced fertility
+### **🐑 Sheep Behavior (Natural Boom-Bust Drivers)**
+- **Energy-Dependent Reproduction**: Only reproduce when energy ≥ 0.35 (well-fed)
+- **Quadratic Energy Scaling**: Low energy severely reduces fertility (creates crashes)
+- **Rapid Consumption**: Deplete 0.8 grass density per feeding (enables overgrazing)
+- **Moderate Energy Cost**: 0.03 energy/step (survive well when grass abundant)
+- **Quick Recovery**: Short gestation (5 steps) enables rapid population booms
+
+### **🐺 Wolf Behavior (Population Control)**
+- **Conservative Reproduction**: Low reproduction rate (0.08) prevents wolf explosions
+- **High Energy Requirements**: Need 0.25 energy to reproduce (must hunt successfully)
+- **Strategic Hunting**: Target sheep within moderate hunting radius
+- **Energy Conservation**: Can survive 50+ steps without food
+- **Pack Dynamics**: Form packs for better hunting success and territorial control
 
 ### **🌱 Grass Ecosystem**
 - **Seed Dispersal**: Mature grass spreads seeds within 2-cell radius
@@ -174,10 +177,11 @@ npm run test:e2e:ui    # Interactive E2E testing
 ## 📈 **Expected Behavior**
 
 ### **Population Targets**
-- **Simulation Duration**: 200+ steps consistently
-- **Sheep Population**: 10-50 individuals (cyclical)
-- **Wolf Population**: 2-15 individuals (lagging cycle)
-- **Grass Coverage**: 200-800 patches (inverse cycle)
+- **Simulation Duration**: 150-200 steps consistently
+- **Oscillation Cycles**: Working towards 3-5 boom-bust cycles per 200 steps
+- **Sheep Population**: 50-200 individuals (cyclical booms and crashes)
+- **Wolf Population**: 10-25 individuals (responsive to sheep availability)
+- **Grass Coverage**: 2000-4000 patches (recovers during sheep crashes)
 
 ### **Ecological Indicators**
 - **Biodiversity**: Consistently high with all species surviving

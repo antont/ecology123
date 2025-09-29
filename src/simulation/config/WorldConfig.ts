@@ -38,11 +38,11 @@ const createWorldConfig = () => {
     initialSheepCount: Math.floor(TOTAL_CELLS * SHEEP_DENSITY),
     initialWolfCount: Math.floor(TOTAL_CELLS * WOLF_DENSITY),
   
-    // Grass parameters
-    grass: {
-    growthRate: 0.08,          // Lower growth rate - easily overwhelmed by sheep booms
+  // Grass parameters (tuned for oscillation dynamics)
+  grass: {
+    growthRate: 0.12,          // Moderate growth rate - can be overwhelmed by sheep booms
     maxDensity: 1.0,           // Maximum grass density per cell
-    consumptionRate: 0.8,      // Very high consumption rate - sheep should deplete grass during booms
+    consumptionRate: 0.7,      // Higher consumption rate - sheep can deplete grass during booms
     spreadingRadius: 1,        // Cells within this radius can be colonized
     seasonalGrowth: true,      // Enable seasonal growth patterns
     winterGrowthRate: 0.05,    // Reduced growth in winter
@@ -60,31 +60,31 @@ const createWorldConfig = () => {
     }
   },
   
-  // Sheep parameters (tuned for oscillation dynamics)
-  sheep: {
-    movementRange: SHEEP_MOVEMENT, // Maximum cells sheep can move per step (scaled to world size)
-    hungerThreshold: 8,        // Lower threshold - sheep need to eat more frequently
-    reproductionRate: 0.14,    // Balanced reproduction rate - enables booms but prevents complete grass depletion
-    reproductionThreshold: 0.25, // Lower threshold - easier breeding for population booms
-    lifespan: 100,             // Maximum lifespan in steps
-    energyPerGrass: 1.6,       // Higher energy gain for rapid population growth
-    energyPerStep: 0.03,       // Moderate energy consumption - sheep survive well when grass is abundant
-    flockingTendency: 0.6,     // Higher flocking for better protection during high predation
-    grazingEfficiency: 0.98,   // Very high grazing efficiency for maximum energy gain
+    // Sheep parameters (balanced for controlled oscillations)
+    sheep: {
+      movementRange: SHEEP_MOVEMENT, // Maximum cells sheep can move per step (scaled to world size)
+      hungerThreshold: 8,        // Moderate eating frequency - allows some population growth
+      reproductionRate: 0.12,    // Moderate reproduction rate - enables booms but not explosions
+      reproductionThreshold: 0.35, // Lower threshold - easier breeding for population recovery
+      lifespan: 100,             // Maximum lifespan in steps
+      energyPerGrass: 1.4,       // Higher energy gain - enables population growth when grass abundant
+      energyPerStep: 0.05,       // Moderate energy consumption - sheep die when grass scarce
+      flockingTendency: 0.6,     // Higher flocking for better protection during high predation
+      grazingEfficiency: 0.98,   // Very high grazing efficiency for maximum energy gain
     
-    // Reproduction parameters (optimized for boom-bust cycles)
+    // Reproduction parameters (balanced for controlled oscillations)
     reproduction: {
-      minAge: 4,               // Earlier sexual maturity for rapid recovery
+      minAge: 6,               // Earlier sexual maturity - enables faster recovery
       maxAge: 80,              // Fertility decline age
-      minEnergy: 0.35,         // Higher minimum energy - sheep need good nutrition to reproduce
-      cooldownPeriod: 6,       // Shorter between pregnancies for explosive recovery
-      gestationPeriod: 5,      // Shorter gestation for rapid population growth
-      energyCost: 0.15,        // Lower energy cost for easier breeding
+      minEnergy: 0.40,         // Moderate minimum energy - well-fed sheep can reproduce
+      cooldownPeriod: 10,      // Moderate between pregnancies - allows population growth
+      gestationPeriod: 6,      // Moderate gestation - reasonable population recovery
+      energyCost: 0.20,        // Moderate energy cost - reproduction has cost but not prohibitive
       partnerProximity: 5,     // Cells to search for mate
-      litterSizeMin: 2,        // Minimum offspring for sustainable growth
-      litterSizeMax: 5,        // Higher maximum offspring for population booms
-      juvenilePeriod: 10,      // Shorter dependency for faster independence
-      inheritanceVariation: 0.1, // Trait variation in offspring
+      litterSizeMin: 1,        // Small litters to prevent explosions
+      litterSizeMax: 4,        // Moderate maximum offspring - enables recovery but not explosion
+      juvenilePeriod: 12,      // Moderate dependency - balanced population turnover
+      inheritanceVariation: 0.1, // Moderate trait variation
     }
   },
   
