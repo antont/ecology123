@@ -88,7 +88,7 @@ export class EcologicalAnalyzer {
       contributingFactors,
       confidence: this.calculateConfidence(recentWolfDeaths, contributingFactors),
       recommendation: this.generateWolfRecommendation(primaryCause, contributingFactors),
-      preventionStrategy: this.generatePreventionStrategy(primaryCause, contributingFactors)
+      preventionStrategy: this.generatePreventionStrategy(primaryCause)
     }
 
     const analysis: ExtinctionAnalysis = {
@@ -509,7 +509,7 @@ export class EcologicalAnalyzer {
    */
   private recordOscillationCycle(
     species: 'grass' | 'sheep' | 'wolves',
-    state: { trend: 'increasing' | 'decreasing'; trendStartStep: number; trendStartPopulation: number; lastPop: number },
+    state: { trend: 'increasing' | 'decreasing' | 'stable'; trendStartStep: number; trendStartPopulation: number; lastPop?: number; peakInTrend?: number; minInTrend?: number },
     currentPop: number,
     step: number,
     newTrend: 'increasing' | 'decreasing'

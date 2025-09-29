@@ -40,9 +40,9 @@ const createWorldConfig = () => {
   
     // Grass parameters
     grass: {
-    growthRate: 0.15,          // Increased probability of growth per cell per step
+    growthRate: 0.08,          // Slow growth rate - overwhelmed during booms but can recover during busts
     maxDensity: 1.0,           // Maximum grass density per cell
-    consumptionRate: 0.3,      // Reduced consumption rate to balance with regeneration
+    consumptionRate: 0.6,      // High consumption rate to force depletion but allow some survival
     spreadingRadius: 1,        // Cells within this radius can be colonized
     seasonalGrowth: true,      // Enable seasonal growth patterns
     winterGrowthRate: 0.05,    // Reduced growth in winter
@@ -64,7 +64,7 @@ const createWorldConfig = () => {
   sheep: {
     movementRange: SHEEP_MOVEMENT, // Maximum cells sheep can move per step (scaled to world size)
     hungerThreshold: 12,       // Higher threshold - sheep can survive longer for oscillations
-    reproductionRate: 0.12,    // Balanced reproduction rate to prevent grass overconsumption
+    reproductionRate: 0.16,    // Higher reproduction rate to enable population booms that deplete grass
     reproductionThreshold: 0.25, // Lower threshold - easier breeding for population booms
     lifespan: 100,             // Maximum lifespan in steps
     energyPerGrass: 1.6,       // Higher energy gain for rapid population growth
@@ -76,7 +76,7 @@ const createWorldConfig = () => {
     reproduction: {
       minAge: 4,               // Earlier sexual maturity for rapid recovery
       maxAge: 80,              // Fertility decline age
-      minEnergy: 0.20,         // Lower minimum energy for easier breeding during recovery
+      minEnergy: 0.35,         // Higher minimum energy - sheep need good nutrition to reproduce
       cooldownPeriod: 6,       // Shorter between pregnancies for explosive recovery
       gestationPeriod: 5,      // Shorter gestation for rapid population growth
       energyCost: 0.15,        // Lower energy cost for easier breeding

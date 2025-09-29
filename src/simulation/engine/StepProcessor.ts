@@ -75,7 +75,7 @@ export class StepProcessor {
       const growthRate = baseGrowthRate * seasonalModifier * temperatureModifier
       
       if (Math.random() < growthRate) {
-        g.density = Math.min(g.density + 0.15, this.config.grass.maxDensity)
+        g.density = Math.min(g.density + 0.05, this.config.grass.maxDensity)
         g.growthStage = this.getGrowthStage(g.density)
       }
     })
@@ -413,7 +413,7 @@ export class StepProcessor {
         
         // Debug logging for wolf deaths (can be removed in production)
         if (type === 'wolf') {
-          console.log(`💀 WOLF DEATH: ${(org as { id: string }).id} died of ${deathCause} at step ${this.currentStep} (energy: ${org.energy.toFixed(2)}, hunger: ${org.hunger}, age: ${org.age})`)
+          console.log(`💀 WOLF DEATH: ${(org as unknown as { id: string }).id} died of ${deathCause} at step ${this.currentStep} (energy: ${org.energy.toFixed(2)}, hunger: ${org.hunger}, age: ${org.age})`)
         }
         
         return false

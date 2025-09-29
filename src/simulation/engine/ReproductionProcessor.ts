@@ -186,8 +186,8 @@ export class ReproductionProcessor {
     // Calculate energy-dependent reproduction probability
     // Well-fed animals have higher reproductive success (ecological realism)
     const avgEnergy = (organism1.energy + organism2.energy) / 2
-    // Use square root scaling to be less restrictive - even medium energy allows decent reproduction
-    const energyScalingFactor = Math.min(1.0, Math.sqrt(avgEnergy / 1.0))
+    // Use quadratic scaling to create stronger boom-bust cycles - low energy severely reduces reproduction
+    const energyScalingFactor = Math.min(1.0, (avgEnergy / 1.0) ** 2)
     const actualReproductionRate = config.reproductionRate * energyScalingFactor
     
     // Apply stochastic reproduction based on energy levels

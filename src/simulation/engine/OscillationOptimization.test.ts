@@ -36,7 +36,7 @@ describe('Oscillation Optimization', () => {
         
         // Show wolf details if population is small
         if (stats.wolfCount <= 5) {
-          const wolves = simulationEngine.getWorld().getOrganismsByType('wolf')
+          const wolves = simulationEngine.getWorld().getOrganismsByType('wolf') as unknown as Array<{ id: string; energy: number; hunger: number; age: number }>
           wolves.forEach((wolf) => {
             const hungerThreshold = WORLD_CONFIG.wolf.hungerThreshold
             const deathHunger = hungerThreshold * 2
