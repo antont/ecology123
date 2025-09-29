@@ -64,7 +64,7 @@ export class OrganismFactory {
         gestationRemaining: 0,
         expectedLitterSize: 0,
         pregnancyEnergyCost: 0,
-        lastMatingStep: 0
+        lastMatingStep: -100 // Allow immediate reproduction
       }
     }
   }
@@ -101,7 +101,7 @@ export class OrganismFactory {
         gestationRemaining: 0,
         expectedLitterSize: 0,
         pregnancyEnergyCost: 0,
-        lastMatingStep: 0
+        lastMatingStep: -100 // Allow immediate reproduction
       }
     }
   }

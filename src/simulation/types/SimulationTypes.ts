@@ -155,13 +155,30 @@ export interface PopulationSnapshot {
 export interface DeathRecord {
   organismId: string;
   organismType: 'grass' | 'sheep' | 'wolf';
-  cause: 'hunger' | 'hunting' | 'age' | 'starvation' | 'grazing' | 'other';
+  cause: 'hunger' | 'hunting' | 'age' | 'starvation' | 'grazing' | 'reproduction_failure' | 'isolation' | 'territorial_conflict' | 'other';
   step: number;
   energy: number;
   age: number;
   x: number;
   y: number;
   details?: string; // Additional context
+  // Enhanced context for analysis
+  populationAtDeath?: {
+    grass: number;
+    sheep: number;
+    wolves: number;
+  };
+  reproductionState?: {
+    isPregnant: boolean;
+    cooldownRemaining: number;
+    offspring: number;
+  };
+  environmentalFactors?: {
+    nearbyPrey?: number;
+    nearbyPredators?: number;
+    localGrassDensity?: number;
+    territoryOverlap?: boolean;
+  };
 }
 
 export interface DeathStatistics {
@@ -173,6 +190,78 @@ export interface DeathStatistics {
   sheepDeaths: number;
   wolfDeaths: number;
   grassDeaths: number;
+}
+
+// Ecological analysis interfaces
+export interface PopulationHealth {
+  species: 'grass' | 'sheep' | 'wolf';
+  currentCount: number;
+  trend: 'increasing' | 'stable' | 'declining' | 'extinct';
+  healthScore: number; // 0-100
+  riskFactors: string[];
+  timeToExtinction?: number; // Estimated steps if trend continues
+}
+
+export interface EcosystemAlert {
+  id: string;
+  severity: 'info' | 'warning' | 'critical';
+  type: 'population_decline' | 'extinction_risk' | 'overpopulation' | 'starvation_event' | 'reproduction_failure';
+  species: 'grass' | 'sheep' | 'wolf';
+  message: string;
+  step: number;
+  data?: Record<string, unknown>;
+}
+
+export interface CauseAnalysis {
+  primaryCause: string;
+  contributingFactors: string[];
+  confidence: number; // 0-1
+  recommendation: string;
+  preventionStrategy?: string;
+}
+
+export interface OscillationCycle {
+  species: 'grass' | 'sheep' | 'wolf';
+  cycleType: 'growth_to_decline' | 'decline_to_growth' | 'near_extinction_recovery';
+  startStep: number;
+  endStep: number;
+  startPopulation: number;
+  endPopulation: number;
+  peakPopulation?: number;
+  minPopulation?: number;
+  duration: number;
+  amplitude: number; // Peak - Min population
+  triggerFactor?: string; // What caused the change
+}
+
+export interface OscillationAnalysis {
+  totalCycles: number;
+  cyclesBySpecies: Record<string, number>;
+  averageCycleDuration: number;
+  averageAmplitude: number;
+  oscillationHealth: 'healthy' | 'damped' | 'chaotic' | 'extinct';
+  recentCycles: OscillationCycle[];
+  nearExtinctionRecoveries: number; // Times species recovered from <10 population
+  overgrowthCorrections: number; // Times overpopulation was corrected
+  stabilityScore: number; // 0-100, higher = more stable oscillations
+}
+
+export interface ExtinctionAnalysis {
+  species: 'sheep' | 'wolf';
+  step: number;
+  lastPopulation: number;
+  causeAnalysis: CauseAnalysis;
+  populationHistory: Array<{ step: number; count: number }>;
+  environmentalContext: {
+    grassAvailability: number;
+    preyAvailability?: number; // For wolves
+    competitionLevel: number;
+  };
+  oscillationContext?: {
+    lastCycles: OscillationCycle[];
+    failedRecoveries: number;
+    cycleBreakdown: string;
+  };
 }
 
 // Simulation engine state

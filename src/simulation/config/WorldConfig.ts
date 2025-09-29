@@ -10,13 +10,13 @@
 // Dynamic world configuration that scales with world size
 const createWorldConfig = () => {
   // Configurable world dimensions - experiment with different sizes!
-  const WORLD_WIDTH = 150;
-  const WORLD_HEIGHT = 150;
+  const WORLD_WIDTH = 70;
+  const WORLD_HEIGHT = 70;
   const TOTAL_CELLS = WORLD_WIDTH * WORLD_HEIGHT;
   
-  // Population densities (as percentages of total cells)
-  const SHEEP_DENSITY = 0.012;  // 1.2% of cells
-  const WOLF_DENSITY = 0.002;   // 0.2% of cells
+  // Population densities (as percentages of total cells) - minimum viable population
+  const SHEEP_DENSITY = 0.025;  // 2.5% of cells - high sheep density for wolf sustainability  
+  const WOLF_DENSITY = 0.003;   // 0.3% of cells - minimum viable wolf population for oscillations
   
   // Scale movement and detection ranges based on world size
   const WORLD_SCALE = Math.sqrt(TOTAL_CELLS) / 50; // Relative to 50x50 baseline
@@ -40,9 +40,9 @@ const createWorldConfig = () => {
   
     // Grass parameters
     grass: {
-    growthRate: 0.1,           // Probability of growth per cell per step
+    growthRate: 0.15,          // Increased probability of growth per cell per step
     maxDensity: 1.0,           // Maximum grass density per cell
-    consumptionRate: 0.5,      // Amount consumed when eaten by sheep (increased for survival)
+    consumptionRate: 0.3,      // Reduced consumption rate to balance with regeneration
     spreadingRadius: 1,        // Cells within this radius can be colonized
     seasonalGrowth: true,      // Enable seasonal growth patterns
     winterGrowthRate: 0.05,    // Reduced growth in winter
@@ -60,63 +60,63 @@ const createWorldConfig = () => {
     }
   },
   
-  // Sheep parameters (ecologically realistic, scaled to world size)
+  // Sheep parameters (tuned for oscillation dynamics)
   sheep: {
     movementRange: SHEEP_MOVEMENT, // Maximum cells sheep can move per step (scaled to world size)
-    hungerThreshold: 10,       // Steps before sheep must eat (increased for stability)
-    reproductionRate: 0.10,    // Probability of reproduction per step when well-fed (increased for massive world)
-    reproductionThreshold: 0.4, // Minimum health required for reproduction (easier breeding)
+    hungerThreshold: 12,       // Higher threshold - sheep can survive longer for oscillations
+    reproductionRate: 0.12,    // Balanced reproduction rate to prevent grass overconsumption
+    reproductionThreshold: 0.25, // Lower threshold - easier breeding for population booms
     lifespan: 100,             // Maximum lifespan in steps
-    energyPerGrass: 1.0,       // Energy gained per grass consumed (further increased)
-    energyPerStep: 0.04,       // Energy lost per step (further reduced)
-    flockingTendency: 0.3,     // Tendency to move toward other sheep
-    grazingEfficiency: 0.9,    // Efficiency of finding grass
+    energyPerGrass: 1.6,       // Higher energy gain for rapid population growth
+    energyPerStep: 0.025,      // Lower energy consumption for better survival
+    flockingTendency: 0.6,     // Higher flocking for better protection during high predation
+    grazingEfficiency: 0.98,   // Very high grazing efficiency for maximum energy gain
     
-    // Reproduction parameters
+    // Reproduction parameters (optimized for boom-bust cycles)
     reproduction: {
-      minAge: 10,              // Sexual maturity age (reduced for faster breeding)
+      minAge: 4,               // Earlier sexual maturity for rapid recovery
       maxAge: 80,              // Fertility decline age
-      minEnergy: 0.3,          // Minimum energy for reproduction (reduced for easier breeding)
-      cooldownPeriod: 10,      // Steps between pregnancies (reduced for faster recovery)
-      gestationPeriod: 8,      // Steps until birth (reduced for faster recovery)
-      energyCost: 0.2,         // Energy cost during pregnancy (reduced for easier breeding)
-      partnerProximity: 5,     // Cells to search for mate (increased for larger world)
-      litterSizeMin: 2,        // Minimum offspring (increased for population growth)
-      litterSizeMax: 3,        // Maximum offspring (increased for population growth)
-      juvenilePeriod: 15,      // Steps until independence
+      minEnergy: 0.20,         // Lower minimum energy for easier breeding during recovery
+      cooldownPeriod: 6,       // Shorter between pregnancies for explosive recovery
+      gestationPeriod: 5,      // Shorter gestation for rapid population growth
+      energyCost: 0.15,        // Lower energy cost for easier breeding
+      partnerProximity: 5,     // Cells to search for mate
+      litterSizeMin: 2,        // Minimum offspring for sustainable growth
+      litterSizeMax: 5,        // Higher maximum offspring for population booms
+      juvenilePeriod: 10,      // Shorter dependency for faster independence
       inheritanceVariation: 0.1, // Trait variation in offspring
     }
   },
   
-  // Wolf parameters (ecologically realistic, scaled to world size)
+  // Wolf parameters (ultra-conservative for survival and oscillations)
   wolf: {
     movementRange: WOLF_MOVEMENT, // Maximum cells wolves can move per step (scaled to world size)
-    hungerThreshold: 35,       // Steps before wolf must eat (extreme survival time)
-    reproductionRate: 0.085,   // Probability of reproduction per step when well-fed (balanced for 200+ step stability)
-    reproductionThreshold: 0.3, // Minimum health required for reproduction (extremely low)
-    lifespan: 150,             // Maximum lifespan in steps
-    energyPerSheep: 3.0,       // Energy gained per sheep consumed (enormous reward)
-    energyPerStep: 0.01,       // Energy lost per step (ultra-minimal consumption)
-    huntingRadius: WOLF_HUNTING_RADIUS, // Radius for detecting sheep (scaled to world size)
-    packHuntingBonus: 0.4,     // Bonus when hunting near other wolves (reduced to prevent over-hunting)
+    hungerThreshold: 50,       // Very high threshold - wolves can survive much longer between meals
+    reproductionRate: 0.15,    // High reproduction rate for population maintenance
+    reproductionThreshold: 0.25, // Lower threshold - easier breeding for population survival
+    lifespan: 200,             // Longer lifespan for better survival
+    energyPerSheep: 5.0,       // Very high energy per kill for excellent survival during lean periods
+    energyPerStep: 0.005,      // Very low energy consumption for maximum survival
+    huntingRadius: Math.max(6, Math.floor(8 * WORLD_SCALE)), // Moderate hunting radius for viable hunting
+    packHuntingBonus: 0.25,    // Moderate hunting efficiency for viable predation
     territorialBehavior: true, // Enable territorial behavior
     territorySize: WOLF_TERRITORY_SIZE, // Size of wolf territory (scaled to world size)
     
-    // Reproduction parameters
+    // Reproduction parameters (aggressive for population maintenance)
     reproduction: {
-      minAge: 5,               // Almost immediate sexual maturity (reduced from 15)
-      maxAge: 120,             // Longer fertility period
-      minEnergy: 0.05,         // Very low energy requirement (reduced for more reproduction)
-      cooldownPeriod: 15,      // Moderate between litters (balanced for stability)
-      gestationPeriod: 5,      // Moderate gestation (balanced for stability)
-      energyCost: 0.2,         // Lower energy cost (easier reproduction)
-      packSizeMin: 1,          // Allow lone wolves to breed (reduced from 2)
-      packSizeMax: 6,          // Maximum optimal pack size
-      territoryRadius: 10,     // Smaller territory requirement (reduced from 15)
-      litterSizeMin: 3,        // Higher minimum offspring (increased for stability)
-      litterSizeMax: 6,        // Higher maximum offspring (increased for stability)
-      juvenilePeriod: 15,      // Shorter dependency (reduced from 20)
-      alphaBreedingOnly: false, // Allow all wolves to breed (changed from true)
+      minAge: 10,              // Early sexual maturity for rapid reproduction
+      maxAge: 150,             // Longer fertility period
+      minEnergy: 0.10,         // Low energy requirement for easier breeding
+      cooldownPeriod: 12,      // Short between litters for rapid reproduction
+      gestationPeriod: 10,     // Short gestation for rapid reproduction
+      energyCost: 0.15,        // Low energy cost for easier breeding
+      packSizeMin: 1,          // Allow lone wolves to breed
+      packSizeMax: 5,          // Larger pack size for better hunting success
+      territoryRadius: 8,      // Smaller territory requirement for easier breeding
+      litterSizeMin: 2,        // Higher minimum offspring for population growth
+      litterSizeMax: 4,        // Higher maximum offspring for rapid population growth
+      juvenilePeriod: 15,      // Shorter dependency for faster population turnover
+      alphaBreedingOnly: false, // Allow all wolves to breed
       inheritanceVariation: 0.15, // Higher trait variation
     }
   },

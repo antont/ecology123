@@ -23,15 +23,15 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
   const displayData = data.slice(-maxDataPoints)
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 h-full">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1">Population Trends</h3>
+    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-1 h-full">
+      <div className="mb-1">
+        <h3 className="text-lg font-semibold text-gray-800 mb-0">Population Trends</h3>
         <p className="text-sm text-gray-600">Real-time ecosystem dynamics</p>
       </div>
       
-      <div className="h-64">
+      <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={displayData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={displayData} margin={{ top: 5, right: 20, left: 20, bottom: 15 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
               dataKey="step" 
@@ -39,8 +39,18 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               fontSize={12}
               tickFormatter={(value) => `Step ${value}`}
             />
+            {/* Left Y-axis for Grass (high values) */}
             <YAxis 
-              stroke="#666"
+              yAxisId="grass"
+              stroke="#22c55e"
+              fontSize={12}
+              tickFormatter={(value) => `${Math.round(value / 1000)}k`}
+            />
+            {/* Right Y-axis for Animals (low values) */}
+            <YAxis 
+              yAxisId="animals"
+              orientation="right"
+              stroke="#6b7280"
               fontSize={12}
               tickFormatter={(value) => value.toString()}
             />
@@ -52,7 +62,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
               }}
               formatter={(value: number, name: string) => [
-                value, 
+                name === 'grass' ? `${Math.round(value / 1000)}k` : value, 
                 name === 'grass' ? 'Grass' : 
                 name === 'sheep' ? 'Sheep' : 
                 name === 'wolves' ? 'Wolves' : name
@@ -62,9 +72,9 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
             <Legend 
               wrapperStyle={{ fontSize: '12px' }}
               formatter={(value) => 
-                value === 'grass' ? 'Grass' : 
-                value === 'sheep' ? 'Sheep' : 
-                value === 'wolves' ? 'Wolves' : value
+                value === 'grass' ? 'Grass (left axis)' : 
+                value === 'sheep' ? 'Sheep (right axis)' : 
+                value === 'wolves' ? 'Wolves (right axis)' : value
               }
             />
             <Line 
@@ -74,6 +84,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               strokeWidth={2}
               dot={false}
               name="grass"
+              yAxisId="grass"
             />
             <Line 
               type="monotone" 
@@ -82,6 +93,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               strokeWidth={2}
               dot={false}
               name="sheep"
+              yAxisId="animals"
             />
             <Line 
               type="monotone" 
@@ -90,6 +102,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               strokeWidth={2}
               dot={false}
               name="wolves"
+              yAxisId="animals"
             />
           </LineChart>
         </ResponsiveContainer>

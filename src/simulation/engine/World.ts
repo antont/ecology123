@@ -77,16 +77,29 @@ export class World {
   }
 
   public recordDeath(organism: Organism, cause: DeathRecord['cause'], details?: string): void {
+    const organismType = this.getOrganismType(organism)
+    
+    // Gather environmental context
+    const environmentalFactors = this.gatherEnvironmentalContext(organism)
+    const reproductionState = this.getReproductionContext(organism)
+    
     const deathRecord: DeathRecord = {
       organismId: organism.id,
-      organismType: this.getOrganismType(organism),
+      organismType,
       cause,
       step: this.state.currentStep,
       energy: organism.energy,
       age: organism.age,
       x: organism.x,
       y: organism.y,
-      details
+      details,
+      populationAtDeath: {
+        grass: this.state.statistics.grassCount,
+        sheep: this.state.statistics.sheepCount,
+        wolves: this.state.statistics.wolfCount
+      },
+      reproductionState,
+      environmentalFactors
     }
 
     // Add to recent deaths (keep last 50)
@@ -276,6 +289,61 @@ export class World {
 
   private isValidPosition(x: number, y: number): boolean {
     return x >= 0 && x < this.state.width && y >= 0 && y < this.state.height
+  }
+
+  private gatherEnvironmentalContext(organism: Organism): DeathRecord['environmentalFactors'] {
+    const radius = 5 // Check 5-cell radius around organism
+    let nearbyPrey = 0
+    let nearbyPredators = 0
+    let localGrassDensity = 0
+    let grassCells = 0
+
+    for (let dx = -radius; dx <= radius; dx++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        const x = organism.x + dx
+        const y = organism.y + dy
+        
+        if (!this.isValidPosition(x, y)) continue
+        
+        const cell = this.state.cells[x][y]
+        
+        // Count grass density
+        if (cell.grass) {
+          localGrassDensity += cell.grass.density
+          grassCells++
+        }
+        
+        // Count prey and predators based on organism type
+        const organismType = this.getOrganismType(organism)
+        if (organismType === 'wolf') {
+          if (cell.sheep) nearbyPrey++
+        } else if (organismType === 'sheep') {
+          if (cell.wolf) nearbyPredators++
+        }
+      }
+    }
+
+    return {
+      nearbyPrey: nearbyPrey > 0 ? nearbyPrey : undefined,
+      nearbyPredators: nearbyPredators > 0 ? nearbyPredators : undefined,
+      localGrassDensity: grassCells > 0 ? localGrassDensity / grassCells : 0,
+      territoryOverlap: false // TODO: Implement territory overlap detection
+    }
+  }
+
+  private getReproductionContext(organism: Organism): DeathRecord['reproductionState'] {
+    // Type guard to check if organism has reproduction state
+    if ('reproductionState' in organism && organism.reproductionState) {
+      const repState = organism.reproductionState as { isPregnant?: boolean }
+      const orgWithOffspring = organism as { reproductionCooldown?: number; offspring?: unknown[] }
+      return {
+        isPregnant: repState.isPregnant || false,
+        cooldownRemaining: orgWithOffspring.reproductionCooldown || 0,
+        offspring: orgWithOffspring.offspring?.length || 0
+      }
+    }
+    
+    return undefined
   }
 
   private updateSeason(): void {

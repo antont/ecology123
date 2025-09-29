@@ -5,7 +5,8 @@
 import { World } from './World'
 import { StepProcessor } from './StepProcessor'
 import { WorldConfig } from '../config/WorldConfig'
-import { SimulationState, SimulationStatistics } from '../types/SimulationTypes'
+import { SimulationState, SimulationStatistics, PopulationHealth, EcosystemAlert, ExtinctionAnalysis, OscillationAnalysis } from '../types/SimulationTypes'
+import { EcologicalAnalyzer } from '../analysis/EcologicalAnalyzer'
 
 export class SimulationEngine {
   private world: World
@@ -13,11 +14,13 @@ export class SimulationEngine {
   private config: WorldConfig
   private state: SimulationState
   private intervalId: NodeJS.Timeout | null = null
+  private analyzer: EcologicalAnalyzer
 
   constructor(config: WorldConfig) {
     this.config = config
     this.world = new World(config)
     this.stepProcessor = new StepProcessor(this.world, config)
+    this.analyzer = new EcologicalAnalyzer(config)
     
     this.state = {
       isRunning: false,
@@ -78,6 +81,7 @@ export class SimulationEngine {
     // Reset world
     this.world = new World(this.config)
     this.stepProcessor = new StepProcessor(this.world, this.config)
+    this.analyzer = new EcologicalAnalyzer(this.config) // Reset analyzer
     
     // Reset state
     this.state = {
@@ -132,6 +136,22 @@ export class SimulationEngine {
     return this.world.getState().statistics
   }
 
+  public getPopulationHealth(): PopulationHealth[] {
+    return this.analyzer.getPopulationHealth()
+  }
+
+  public getEcosystemAlerts(): EcosystemAlert[] {
+    return this.analyzer.getActiveAlerts()
+  }
+
+  public getExtinctionAnalysis(): ExtinctionAnalysis | null {
+    return this.analyzer.getLatestExtinctionAnalysis()
+  }
+
+  public getOscillationAnalysis(): OscillationAnalysis {
+    return this.analyzer.getOscillationAnalysis()
+  }
+
   public getConfig(): WorldConfig {
     return this.config
   }
@@ -168,7 +188,11 @@ export class SimulationEngine {
     this.state.currentStep = this.world.getCurrentStep()
     this.state.world = this.world.getState()
     
-    // Check for extinction events
+    // Record population data for analysis
+    const stats = this.world.getState().statistics
+    this.analyzer.recordPopulation(this.state.currentStep, stats)
+    
+    // Check for extinction events and analyze them
     this.checkExtinctionEvents()
     
     // Log debug information if enabled
@@ -193,6 +217,10 @@ export class SimulationEngine {
     // Check for wolf extinction
     if (stats.wolfCount === 0 && !this.hasExtinctionEvent('wolf')) {
       this.addExtinctionEvent('wolf', 'starvation')
+      
+      // Perform detailed extinction analysis
+      const analysis = this.analyzer.analyzeWolfExtinction(this.state.currentStep, stats.deathStats)
+      console.log('🐺 WOLF EXTINCTION ANALYSIS:', analysis)
     }
     
     // Pause simulation if extinction occurs and debug setting is enabled

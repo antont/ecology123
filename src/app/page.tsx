@@ -18,13 +18,13 @@ export default function Home() {
         </p>
       </header>
       
-      <main className="flex-1 px-4 pb-4 min-h-0">
+      <main className="flex-1 px-4 pb-4 min-h-0 overflow-hidden">
         <SimulationGrid 
           cellSize={cellSize}
         />
       </main>
       
-      <footer className="flex-shrink-0 text-center py-2 px-4 text-xs text-gray-500">
+      <footer className="flex-shrink-0 text-center py-1 px-4 text-xs text-gray-500 pointer-events-none">
         <p>
           Built with Next.js, TypeScript, and array-oriented programming patterns
         </p>

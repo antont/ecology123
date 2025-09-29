@@ -27,17 +27,17 @@ export class ReproductionProcessor {
   /**
    * Process all reproduction activities for the current step
    */
-  public processReproduction(): void {
-    const currentStep = this.world.getCurrentStep()
+  public processReproduction(currentStep: number = 0): void {
+    const step = currentStep || this.world.getCurrentStep()
     
     // Process sheep reproduction
-    this.processSheepReproduction(currentStep)
+    this.processSheepReproduction(step)
     
     // Process wolf reproduction
-    this.processWolfReproduction(currentStep)
+    this.processWolfReproduction(step)
     
     // Process grass spreading
-    this.processGrassReproduction(currentStep)
+    this.processGrassReproduction(step)
   }
 
   /**
@@ -81,7 +81,7 @@ export class ReproductionProcessor {
           gestationRemaining: 0,
           expectedLitterSize: 0,
           pregnancyEnergyCost: 0,
-          lastMatingStep: 0
+          lastMatingStep: -100 // Allow immediate reproduction
         }
       }
       if (!wolf.packRole) {

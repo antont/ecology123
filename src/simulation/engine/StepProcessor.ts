@@ -19,6 +19,7 @@ export class StepProcessor {
   private world: World
   private config: WorldConfig
   private reproductionProcessor: ReproductionProcessor
+  private currentStep: number = 0
 
   constructor(world: World, config: WorldConfig) {
     this.world = world
@@ -27,13 +28,15 @@ export class StepProcessor {
   }
 
   public processStep(): void {
+    this.currentStep++
+    
     // Process all organisms in batch operations
     this.processGrassBatch()
     this.processSheepBatch()
     this.processWolvesBatch()
     
     // Process reproduction for all species
-    this.reproductionProcessor.processReproduction()
+    this.reproductionProcessor.processReproduction(this.currentStep)
     
     // Update world statistics
     this.world.updateStatistics()
@@ -72,7 +75,7 @@ export class StepProcessor {
       const growthRate = baseGrowthRate * seasonalModifier * temperatureModifier
       
       if (Math.random() < growthRate) {
-        g.density = Math.min(g.density + 0.1, this.config.grass.maxDensity)
+        g.density = Math.min(g.density + 0.15, this.config.grass.maxDensity)
         g.growthStage = this.getGrowthStage(g.density)
       }
     })
@@ -148,7 +151,7 @@ export class StepProcessor {
 
         if (cell.grass.density <= 0) {
           this.world.recordDeath(cell.grass, 'grazing', `Grazed by sheep ${s.id}`)
-          this.world.clearCellContent(s.x, s.y)
+          delete cell.grass // Only remove grass, keep other organisms
         }
         return
       }
@@ -168,7 +171,7 @@ export class StepProcessor {
 
           if (targetCell.grass.density <= 0) {
             this.world.recordDeath(targetCell.grass, 'grazing', `Grazed by sheep ${s.id}`)
-            this.world.clearCellContent(target.x, target.y)
+            delete targetCell.grass // Only remove grass, keep other organisms
           }
         }
       }
@@ -281,8 +284,6 @@ export class StepProcessor {
     // Batch process movement
     this.processWolfMovementBatch(aliveWolves)
 
-    // Batch process reproduction
-    this.processWolfReproductionBatch(aliveWolves)
   }
 
   private processWolfHuntingBatch(wolves: Wolf[]): void {
@@ -303,8 +304,13 @@ export class StepProcessor {
         
         if (distance <= 1) {
           // Eat the sheep
+          console.log(`🍖 WOLF HUNT SUCCESS: ${w.id} caught sheep ${target.id} at step ${this.currentStep} (energy: ${w.energy.toFixed(2)} -> ${(w.energy + this.config.wolf.energyPerSheep).toFixed(2)}, hunger: ${w.hunger} -> 0)`)
           this.world.recordDeath(target, 'hunting', `Hunted by wolf ${w.id}`)
-          this.world.clearCellContent(target.x, target.y)
+          // Only remove the sheep, keep other organisms in the cell
+          const cell = this.world.getCell(target.x, target.y)
+          if (cell) {
+            delete cell.sheep
+          }
           w.energy += this.config.wolf.energyPerSheep
           w.hunger = 0
           w.huntingTarget = undefined
@@ -314,6 +320,9 @@ export class StepProcessor {
         }
       } else {
         // No sheep found nearby, clear hunting target
+        if (w.hunger > 80) {
+          console.log(`🔍 WOLF HUNTING FAILURE: ${w.id} found no sheep within radius ${huntingRadius} at step ${this.currentStep} (energy: ${w.energy.toFixed(2)}, hunger: ${w.hunger})`)
+        }
         w.huntingTarget = undefined
       }
     })
@@ -371,25 +380,6 @@ export class StepProcessor {
     })
   }
 
-  private processWolfReproductionBatch(wolves: Wolf[]): void {
-    const eligibleWolves = wolves.filter(w => 
-      w.reproductionCooldown === 0 && 
-      w.energy >= this.config.wolf.reproductionThreshold
-    )
-
-    if (eligibleWolves.length < 2) return
-
-    // Group wolves by proximity for reproduction
-    const reproductionPairs = this.findReproductionPairs(eligibleWolves, 3)
-    
-    reproductionPairs.forEach(([parent1, parent2]) => {
-      if (Math.random() < this.config.wolf.reproductionRate) {
-        this.createWolfOffspring(parent1, parent2)
-        parent1.reproductionCooldown = 30
-        parent2.reproductionCooldown = 30
-      }
-    })
-  }
 
   // Helper methods for batch operations
   private processDeaths<T extends { isAlive: boolean; age: number; energy: number; hunger: number; x: number; y: number }>(
@@ -420,6 +410,12 @@ export class StepProcessor {
         org.isAlive = false
         this.world.clearCellContent(org.x, org.y)
         this.world.recordDeath(org as unknown as Sheep | Wolf | Grass, deathCause, deathDetails)
+        
+        // Debug logging for wolf deaths (can be removed in production)
+        if (type === 'wolf') {
+          console.log(`💀 WOLF DEATH: ${(org as { id: string }).id} died of ${deathCause} at step ${this.currentStep} (energy: ${org.energy.toFixed(2)}, hunger: ${org.hunger}, age: ${org.age})`)
+        }
+        
         return false
       }
       
@@ -505,44 +501,17 @@ export class StepProcessor {
     }
   }
 
-  private createWolfOffspring(parent1: Wolf, parent2: Wolf): void {
-    const offspringX = parent1.x + Math.floor(Math.random() * 5) - 2
-    const offspringY = parent1.y + Math.floor(Math.random() * 5) - 2
-    
-    if (this.isValidPosition(offspringX, offspringY)) {
-      const targetCell = this.world.getCell(offspringX, offspringY)
-      if (targetCell && !targetCell.sheep && !targetCell.wolf) {
-        const offspring: Wolf = {
-          id: `wolf-${Date.now()}-${Math.random()}`,
-          x: offspringX,
-          y: offspringY,
-          energy: 0.6,
-          age: 0,
-          isAlive: true,
-          hunger: 0,
-          reproductionCooldown: 15,
-          lastDirection: Direction.NORTH,
-          huntingTarget: undefined,
-          reproductionState: {
-            isPregnant: false,
-            gestationRemaining: 0,
-            expectedLitterSize: 0,
-            pregnancyEnergyCost: 0,
-            lastMatingStep: 0
-          },
-          packRole: 'omega'
-        }
-        
-        this.world.setCellContent(offspringX, offspringY, { wolf: offspring })
-      }
-    }
-  }
 
   private moveOrganism(organism: Sheep | Wolf, newX: number, newY: number, type: 'sheep' | 'wolf'): void {
     const oldX = organism.x
     const oldY = organism.y
     
-    this.world.clearCellContent(oldX, oldY)
+    // Only remove the specific organism from the old cell, keep other organisms
+    const oldCell = this.world.getCell(oldX, oldY)
+    if (oldCell) {
+      delete oldCell[type]
+    }
+    
     organism.x = newX
     organism.y = newY
     organism.lastDirection = this.getDirection(newX - oldX, newY - oldY)

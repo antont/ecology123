@@ -114,7 +114,8 @@ export class WorldInitializer {
         y: position.y,
         energy: 0.9, // High starting energy
         age: Math.floor(this.rng() * 30), // Varied ages
-        packRole: i < 2 ? 'alpha' : 'omega' // First two are alphas
+        packRole: i < 2 ? 'alpha' : 'omega', // First two are alphas
+        packId: `pack-${Math.floor(i / 5)}` // Create packs of ~5 wolves each
       })
 
       world.setCellContent(position.x, position.y, { wolf })
