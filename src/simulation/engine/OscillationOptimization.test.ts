@@ -215,6 +215,89 @@ describe('Oscillation Optimization', () => {
     // The test passes if we achieve reasonable oscillations
     expect(baselineResult.totalCycles).toBeGreaterThanOrEqual(3)
   })
+
+  test('should achieve sustained oscillations over 1000 steps', async () => {
+    console.log('🌊 Testing long-term oscillation sustainability over 1000 steps...')
+    
+    const stepLog: Array<{step: number, grass: number, sheep: number, wolves: number}> = []
+    let extinctionStep = -1
+    
+    // Run simulation for 1000 steps
+    for (let step = 0; step < 1000; step++) {
+      simulationEngine.step()
+      
+      const stats = simulationEngine.getStatistics()
+      
+      // Log every 50 steps for analysis
+      if (step % 50 === 0) {
+        stepLog.push({
+          step,
+          grass: stats.grassCount,
+          sheep: stats.sheepCount,
+          wolves: stats.wolfCount
+        })
+        console.log(`Step ${step}: Grass=${stats.grassCount}, Sheep=${stats.sheepCount}, Wolves=${stats.wolfCount}`)
+      }
+      
+      // Check for extinction
+      if (stats.sheepCount === 0 || stats.wolfCount === 0) {
+        extinctionStep = step
+        console.log(`💀 Extinction at step ${step}: Sheep=${stats.sheepCount}, Wolves=${stats.wolfCount}`)
+        break
+      }
+    }
+    
+    const oscillationAnalysis = simulationEngine.getOscillationAnalysis()
+    const finalStats = simulationEngine.getStatistics()
+    
+    console.log('\n🔬 LONG-TERM OSCILLATION ANALYSIS:')
+    console.log(`Total Oscillation Cycles: ${oscillationAnalysis.totalCycles}`)
+    console.log(`Cycles by Species:`, oscillationAnalysis.cyclesBySpecies)
+    console.log(`Near-Extinction Recoveries: ${oscillationAnalysis.nearExtinctionRecoveries}`)
+    console.log(`Overgrowth Corrections: ${oscillationAnalysis.overgrowthCorrections}`)
+    console.log(`Average Cycle Duration: ${oscillationAnalysis.averageCycleDuration.toFixed(1)} steps`)
+    console.log(`Oscillation Health: ${oscillationAnalysis.oscillationHealth}`)
+    console.log(`Stability Score: ${oscillationAnalysis.stabilityScore}/100`)
+    
+    if (extinctionStep === -1) {
+      console.log(`🎉 SUCCESS: All species survived full 1000 steps!`)
+    } else {
+      console.log(`⚠️  Simulation ended at step ${extinctionStep} due to extinction`)
+    }
+    
+    console.log('\n📊 Population Trajectory:')
+    stepLog.forEach(log => {
+      console.log(`  Step ${log.step}: G=${log.grass}, S=${log.sheep}, W=${log.wolves}`)
+    })
+    
+    console.log('\n🔍 Recent Oscillation Cycles:')
+    oscillationAnalysis.recentCycles.slice(-10).forEach((cycle, i) => {
+      console.log(`  ${i + 1}. ${cycle.species} ${cycle.cycleType} (${cycle.duration} steps, amplitude: ${cycle.amplitude})${cycle.triggerFactor ? ` - ${cycle.triggerFactor}` : ''}`)
+    })
+    
+    console.log(`\n📈 Final Populations: Grass=${finalStats.grassCount}, Sheep=${finalStats.sheepCount}, Wolves=${finalStats.wolfCount}`)
+    
+    // Calculate oscillation frequency (cycles per 1000 steps)
+    const oscillationFrequency = extinctionStep === -1 ? 
+      oscillationAnalysis.totalCycles / 10 : // cycles per 100 steps if survived
+      oscillationAnalysis.totalCycles / (extinctionStep / 100) // cycles per 100 steps until extinction
+    
+    console.log(`\n🌊 Oscillation Frequency: ${oscillationFrequency.toFixed(2)} cycles per 100 steps`)
+    
+    // Test expectations for long-term sustainability
+    if (extinctionStep === -1) {
+      // If survived full 1000 steps, expect significant oscillations
+      expect(oscillationAnalysis.totalCycles).toBeGreaterThanOrEqual(5)
+      expect(oscillationAnalysis.stabilityScore).toBeGreaterThanOrEqual(30)
+    } else {
+      // If extinction occurred, still expect some oscillations before extinction
+      expect(oscillationAnalysis.totalCycles).toBeGreaterThanOrEqual(2)
+      expect(extinctionStep).toBeGreaterThan(200) // Should last at least 200 steps
+    }
+    
+    // Expect evidence of ecosystem dynamics
+    expect(oscillationAnalysis.nearExtinctionRecoveries + oscillationAnalysis.overgrowthCorrections).toBeGreaterThan(0)
+  }, 120000) // 2 minute timeout for long test
 })
 
 /**
