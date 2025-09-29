@@ -4,7 +4,7 @@ import { PopulationDashboard } from './PopulationDashboard'
 
 // Mock PopulationChart component
 vi.mock('./PopulationChart', () => ({
-  PopulationChart: ({ data, currentStats }: any) => (
+  PopulationChart: ({ data }: { data: unknown[] }) => (
     <div data-testid="population-chart" data-points={data.length}>
       Chart with {data.length} data points
     </div>

@@ -4,20 +4,20 @@ import { PopulationChart } from './PopulationChart'
 
 // Mock Recharts components to avoid complex rendering issues in tests
 vi.mock('recharts', () => ({
-  LineChart: ({ children, data }: any) => (
+  LineChart: ({ children, data }: { children: React.ReactNode; data: unknown[] }) => (
     <div data-testid="line-chart" data-chart-data={JSON.stringify(data)}>
       {children}
     </div>
   ),
-  Line: ({ dataKey, stroke, name }: any) => (
+  Line: ({ dataKey, stroke, name }: { dataKey: string; stroke: string; name: string }) => (
     <div data-testid={`line-${name}`} data-stroke={stroke} data-key={dataKey} />
   ),
-  XAxis: ({ dataKey }: any) => <div data-testid="x-axis" data-key={dataKey} />,
+  XAxis: ({ dataKey }: { dataKey: string }) => <div data-testid="x-axis" data-key={dataKey} />,
   YAxis: () => <div data-testid="y-axis" />,
   CartesianGrid: () => <div data-testid="cartesian-grid" />,
   Tooltip: () => <div data-testid="tooltip" />,
   Legend: () => <div data-testid="legend" />,
-  ResponsiveContainer: ({ children }: any) => (
+  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="responsive-container">{children}</div>
   ),
 }))

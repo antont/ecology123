@@ -39,6 +39,7 @@ const mockCanvasContext = {
   strokeRect: vi.fn(),
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 HTMLCanvasElement.prototype.getContext = vi.fn(() => mockCanvasContext) as any
 
 describe('SimulationGrid', () => {
