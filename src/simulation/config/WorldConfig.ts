@@ -40,9 +40,9 @@ const createWorldConfig = () => {
   
     // Grass parameters
     grass: {
-    growthRate: 0.12,          // Moderate growth rate - overwhelmed during booms but recovers during busts
+    growthRate: 0.08,          // Lower growth rate - easily overwhelmed by sheep booms
     maxDensity: 1.0,           // Maximum grass density per cell
-    consumptionRate: 0.6,      // High consumption rate to force depletion but allow some survival
+    consumptionRate: 0.8,      // Very high consumption rate - sheep should deplete grass during booms
     spreadingRadius: 1,        // Cells within this radius can be colonized
     seasonalGrowth: true,      // Enable seasonal growth patterns
     winterGrowthRate: 0.05,    // Reduced growth in winter
@@ -68,7 +68,7 @@ const createWorldConfig = () => {
     reproductionThreshold: 0.25, // Lower threshold - easier breeding for population booms
     lifespan: 100,             // Maximum lifespan in steps
     energyPerGrass: 1.6,       // Higher energy gain for rapid population growth
-    energyPerStep: 0.08,       // Much higher energy consumption - rapid die-off when grass is scarce
+    energyPerStep: 0.03,       // Moderate energy consumption - sheep survive well when grass is abundant
     flockingTendency: 0.6,     // Higher flocking for better protection during high predation
     grazingEfficiency: 0.98,   // Very high grazing efficiency for maximum energy gain
     
@@ -92,7 +92,7 @@ const createWorldConfig = () => {
   wolf: {
     movementRange: WOLF_MOVEMENT, // Maximum cells wolves can move per step (scaled to world size)
     hungerThreshold: 50,       // Very high threshold - wolves can survive much longer between meals
-    reproductionRate: 0.15,    // High reproduction rate for population maintenance
+    reproductionRate: 0.08,    // Much lower reproduction rate - wolves shouldn't multiply unchecked
     reproductionThreshold: 0.25, // Lower threshold - easier breeding for population survival
     lifespan: 200,             // Longer lifespan for better survival
     energyPerSheep: 5.0,       // Very high energy per kill for excellent survival during lean periods
@@ -106,7 +106,7 @@ const createWorldConfig = () => {
     reproduction: {
       minAge: 10,              // Early sexual maturity for rapid reproduction
       maxAge: 150,             // Longer fertility period
-      minEnergy: 0.10,         // Low energy requirement for easier breeding
+      minEnergy: 0.25,         // Higher energy requirement - wolves need successful hunting to reproduce
       cooldownPeriod: 12,      // Short between litters for rapid reproduction
       gestationPeriod: 10,     // Short gestation for rapid reproduction
       energyCost: 0.15,        // Low energy cost for easier breeding
