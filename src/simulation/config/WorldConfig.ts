@@ -40,7 +40,7 @@ const createWorldConfig = () => {
   
     // Grass parameters
     grass: {
-    growthRate: 0.08,          // Slow growth rate - overwhelmed during booms but can recover during busts
+    growthRate: 0.12,          // Moderate growth rate - overwhelmed during booms but recovers during busts
     maxDensity: 1.0,           // Maximum grass density per cell
     consumptionRate: 0.6,      // High consumption rate to force depletion but allow some survival
     spreadingRadius: 1,        // Cells within this radius can be colonized
@@ -63,12 +63,12 @@ const createWorldConfig = () => {
   // Sheep parameters (tuned for oscillation dynamics)
   sheep: {
     movementRange: SHEEP_MOVEMENT, // Maximum cells sheep can move per step (scaled to world size)
-    hungerThreshold: 12,       // Higher threshold - sheep can survive longer for oscillations
-    reproductionRate: 0.16,    // Higher reproduction rate to enable population booms that deplete grass
+    hungerThreshold: 8,        // Lower threshold - sheep need to eat more frequently
+    reproductionRate: 0.14,    // Balanced reproduction rate - enables booms but prevents complete grass depletion
     reproductionThreshold: 0.25, // Lower threshold - easier breeding for population booms
     lifespan: 100,             // Maximum lifespan in steps
     energyPerGrass: 1.6,       // Higher energy gain for rapid population growth
-    energyPerStep: 0.025,      // Lower energy consumption for better survival
+    energyPerStep: 0.08,       // Much higher energy consumption - rapid die-off when grass is scarce
     flockingTendency: 0.6,     // Higher flocking for better protection during high predation
     grazingEfficiency: 0.98,   // Very high grazing efficiency for maximum energy gain
     
