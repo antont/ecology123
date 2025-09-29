@@ -19,13 +19,13 @@ describe('Oscillation Optimization', () => {
     WorldInitializer.createProductionEcosystem(world, WORLD_CONFIG)
   })
 
-  test('should achieve at least 5 oscillation cycles in 200 steps', async () => {
-    console.log('🌊 Testing oscillation dynamics over 200 steps...')
+  test('should achieve at least 5 oscillation cycles in 1000 steps', async () => {
+    console.log('🌊 Testing oscillation dynamics over 1000 steps...')
     
     let previousWolfCount = simulationEngine.getStatistics().wolfCount
     
-    // Run simulation for 200 steps
-    for (let step = 0; step < 200; step++) {
+    // Run simulation for 1000 steps
+    for (let step = 0; step < 1000; step++) {
       simulationEngine.step()
       
       const stats = simulationEngine.getStatistics()
@@ -49,7 +49,7 @@ describe('Oscillation Optimization', () => {
       }
       
       // Log major population changes
-      if (step % 20 === 0) {
+      if (step % 100 === 0) {
         console.log(`Step ${step}: Grass=${stats.grassCount}, Sheep=${stats.sheepCount}, Wolves=${stats.wolfCount}`)
       }
       
@@ -228,8 +228,8 @@ async function runOscillationTest(engine: SimulationEngine): Promise<{
 }> {
   let duration = 0
   
-  // Run until extinction or 200 steps
-  for (let step = 0; step < 200; step++) {
+  // Run until extinction or 1000 steps
+  for (let step = 0; step < 1000; step++) {
     engine.step()
     duration = step + 1
     

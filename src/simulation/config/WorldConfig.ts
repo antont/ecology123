@@ -38,52 +38,52 @@ const createWorldConfig = () => {
     initialSheepCount: Math.floor(TOTAL_CELLS * SHEEP_DENSITY),
     initialWolfCount: Math.floor(TOTAL_CELLS * WOLF_DENSITY),
   
-  // Grass parameters (tuned for oscillation dynamics)
+  // Grass parameters (vulnerable to create frequent oscillations)
   grass: {
-    growthRate: 0.12,          // Moderate growth rate - can be overwhelmed by sheep booms
+    growthRate: 0.08,          // Slower growth rate - easily overwhelmed by sheep booms
     maxDensity: 1.0,           // Maximum grass density per cell
-    consumptionRate: 0.7,      // Higher consumption rate - sheep can deplete grass during booms
+    consumptionRate: 0.8,      // High consumption rate - sheep deplete grass quickly during booms
     spreadingRadius: 1,        // Cells within this radius can be colonized
     seasonalGrowth: true,      // Enable seasonal growth patterns
-    winterGrowthRate: 0.05,    // Reduced growth in winter
-    summerGrowthRate: 0.15,    // Increased growth in summer
+    winterGrowthRate: 0.03,    // Much slower growth in winter
+    summerGrowthRate: 0.12,    // Moderate growth in summer
     
-    // Reproduction/spreading parameters
+    // Reproduction/spreading parameters (reduced for vulnerability)
     reproduction: {
-      minDensity: 0.6,         // Minimum density to produce seeds
+      minDensity: 0.7,         // Higher threshold to produce seeds
       spreadRadius: 2,         // How far seeds can spread
-      spreadProbability: 0.3,  // Chance per step to spread seeds
-      seasonalBonus: 1.5,      // Spring/summer spreading bonus
+      spreadProbability: 0.2,  // Lower chance per step to spread seeds
+      seasonalBonus: 1.3,      // Reduced spring/summer spreading bonus
       competitionRadius: 1,    // Competition with nearby grass
-      maxSeedsPerStep: 3,      // Maximum seeds produced per step
-      seedViability: 0.7,      // Probability seed becomes grass
+      maxSeedsPerStep: 2,      // Fewer seeds produced per step
+      seedViability: 0.6,      // Lower probability seed becomes grass
     }
   },
   
-    // Sheep parameters (balanced for controlled oscillations)
+    // Sheep parameters (smaller booms, more frequent cycles)
     sheep: {
       movementRange: SHEEP_MOVEMENT, // Maximum cells sheep can move per step (scaled to world size)
-      hungerThreshold: 8,        // Moderate eating frequency - allows some population growth
-      reproductionRate: 0.12,    // Moderate reproduction rate - enables booms but not explosions
-      reproductionThreshold: 0.35, // Lower threshold - easier breeding for population recovery
+      hungerThreshold: 6,        // Frequent eating - creates pressure but limits boom size
+      reproductionRate: 0.12,    // Moderate reproduction - prevents massive booms
+      reproductionThreshold: 0.35, // Moderate threshold - requires decent nutrition
       lifespan: 100,             // Maximum lifespan in steps
-      energyPerGrass: 1.4,       // Higher energy gain - enables population growth when grass abundant
-      energyPerStep: 0.05,       // Moderate energy consumption - sheep die when grass scarce
+      energyPerGrass: 1.2,       // Moderate energy gain - limits boom potential
+      energyPerStep: 0.04,       // Lower energy consumption - some sheep survive crashes
       flockingTendency: 0.6,     // Higher flocking for better protection during high predation
       grazingEfficiency: 0.98,   // Very high grazing efficiency for maximum energy gain
     
-    // Reproduction parameters (balanced for controlled oscillations)
+    // Reproduction parameters (smaller litters, controlled growth)
     reproduction: {
-      minAge: 6,               // Earlier sexual maturity - enables faster recovery
+      minAge: 8,               // Later maturity - slows population growth
       maxAge: 80,              // Fertility decline age
-      minEnergy: 0.40,         // Moderate minimum energy - well-fed sheep can reproduce
-      cooldownPeriod: 10,      // Moderate between pregnancies - allows population growth
-      gestationPeriod: 6,      // Moderate gestation - reasonable population recovery
-      energyCost: 0.20,        // Moderate energy cost - reproduction has cost but not prohibitive
+      minEnergy: 0.45,         // Higher minimum energy - reduces reproduction during stress
+      cooldownPeriod: 12,      // Longer between pregnancies - limits boom size
+      gestationPeriod: 7,      // Longer gestation - slower population growth
+      energyCost: 0.25,        // Higher energy cost - makes reproduction more expensive
       partnerProximity: 5,     // Cells to search for mate
       litterSizeMin: 1,        // Small litters to prevent explosions
-      litterSizeMax: 4,        // Moderate maximum offspring - enables recovery but not explosion
-      juvenilePeriod: 12,      // Moderate dependency - balanced population turnover
+      litterSizeMax: 3,        // Smaller maximum litters - prevents massive booms
+      juvenilePeriod: 15,      // Longer dependency - slower population turnover
       inheritanceVariation: 0.1, // Moderate trait variation
     }
   },
