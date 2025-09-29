@@ -79,8 +79,8 @@ describe('SimulationEngine', () => {
   it('should get world state', () => {
     const world = simulationEngine.getWorld()
     expect(world).toBeDefined()
-    expect(world.getWidth()).toBe(50)
-    expect(world.getHeight()).toBe(50)
+    expect(world.getWidth()).toBe(70)
+    expect(world.getHeight()).toBe(70)
   })
 
   it('should get simulation statistics', () => {

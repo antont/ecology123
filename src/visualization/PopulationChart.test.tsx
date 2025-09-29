@@ -103,7 +103,7 @@ describe('PopulationChart', () => {
     render(<PopulationChart data={mockData} />)
     
     expect(screen.getByTestId('x-axis')).toBeInTheDocument()
-    expect(screen.getByTestId('y-axis')).toBeInTheDocument()
+    expect(screen.getAllByTestId('y-axis')).toHaveLength(2) // Dual Y-axes for grass and animals
     expect(screen.getByTestId('cartesian-grid')).toBeInTheDocument()
     expect(screen.getByTestId('tooltip')).toBeInTheDocument()
     expect(screen.getByTestId('legend')).toBeInTheDocument()

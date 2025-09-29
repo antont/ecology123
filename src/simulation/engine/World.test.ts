@@ -12,14 +12,14 @@ describe('World', () => {
   })
 
   it('should initialize with correct dimensions', () => {
-    expect(world.getWidth()).toBe(50)
-    expect(world.getHeight()).toBe(50)
+    expect(world.getWidth()).toBe(70)
+    expect(world.getHeight()).toBe(70)
   })
 
   it('should initialize with empty cells', () => {
     const cells = world.getCells()
-    expect(cells).toHaveLength(50)
-    expect(cells[0]).toHaveLength(50)
+    expect(cells).toHaveLength(70)
+    expect(cells[0]).toHaveLength(70)
   })
 
   it('should initialize with spring season', () => {
@@ -52,8 +52,8 @@ describe('World', () => {
   it('should return null for out-of-bounds coordinates', () => {
     expect(world.getCell(-1, 0)).toBeNull()
     expect(world.getCell(0, -1)).toBeNull()
-    expect(world.getCell(50, 0)).toBeNull()
-    expect(world.getCell(0, 50)).toBeNull()
+    expect(world.getCell(70, 0)).toBeNull()
+    expect(world.getCell(0, 70)).toBeNull()
   })
 
   it('should return null for setCellContent with out-of-bounds coordinates', () => {
