@@ -44,6 +44,7 @@ export class OrganismFactory {
     y: number
     energy?: number
     age?: number
+    hunger?: number
     grazingEfficiency?: number
     flockId?: string
   }): Sheep {
@@ -54,7 +55,7 @@ export class OrganismFactory {
       energy: params.energy ?? 0.8,
       age: params.age ?? 0,
       isAlive: true,
-      hunger: 0,
+      hunger: params.hunger ?? 0,
       reproductionCooldown: 0,
       lastDirection: Direction.NORTH,
       grazingEfficiency: params.grazingEfficiency ?? 0.8,
@@ -78,6 +79,7 @@ export class OrganismFactory {
     y: number
     energy?: number
     age?: number
+    hunger?: number
     packId?: string
     territoryId?: string
     packRole?: 'alpha' | 'beta' | 'omega'
@@ -89,7 +91,7 @@ export class OrganismFactory {
       energy: params.energy ?? 0.9,
       age: params.age ?? 0,
       isAlive: true,
-      hunger: 0,
+      hunger: params.hunger ?? 0,
       reproductionCooldown: 0,
       lastDirection: Direction.NORTH,
       huntingTarget: undefined,
