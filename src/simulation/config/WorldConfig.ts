@@ -64,8 +64,8 @@ const createWorldConfig = () => {
     sheep: {
       movementRange: SHEEP_MOVEMENT, // Enhanced movement range for better foraging
       hungerThreshold: 10,       // Higher threshold - sheep need to eat more frequently
-      reproductionRate: 0.06,    // Much more conservative - prevent explosive 24x growth
-      reproductionThreshold: 0.50, // Much higher threshold - require abundant energy
+      reproductionRate: 0.08,    // Balanced reproduction - prevent explosions but allow recovery
+      reproductionThreshold: 0.45, // Moderate threshold - enable recovery after crashes
       lifespan: 100,             // Maximum lifespan in steps
       energyPerGrass: 1.4,       // Higher energy gain - enables recovery from crashes
       energyPerStep: 0.03,       // Lower energy consumption - easier survival during recovery
@@ -74,12 +74,12 @@ const createWorldConfig = () => {
     
     // Reproduction parameters (very controlled growth)
     reproduction: {
-      minAge: 10,              // Later maturity - slower population growth
+      minAge: 8,               // Moderate maturity - allow recovery
       maxAge: 80,              // Fertility decline age
-      minEnergy: 0.60,         // Much higher minimum energy - require abundance
-      cooldownPeriod: 15,      // Longer between pregnancies - prevent explosions
-      gestationPeriod: 8,      // Longer gestation - slower population growth
-      energyCost: 0.35,        // Higher energy cost - make reproduction expensive
+      minEnergy: 0.50,         // Moderate minimum energy - balance abundance and recovery
+      cooldownPeriod: 12,      // Moderate between pregnancies - allow recovery
+      gestationPeriod: 6,      // Shorter gestation - enable recovery
+      energyCost: 0.30,        // Moderate energy cost - balance reproduction
       partnerProximity: 5,     // Cells to search for mate
       litterSizeMin: 1,        // Small litters to prevent explosions
       litterSizeMax: 2,        // Smaller litters - prevent population explosions
