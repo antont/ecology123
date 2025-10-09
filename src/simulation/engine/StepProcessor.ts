@@ -106,6 +106,7 @@ export class StepProcessor {
         }
       }
     })
+    
   }
 
   private processSheepBatch(): void {
@@ -184,7 +185,11 @@ export class StepProcessor {
 
     // Process movement for all sheep
     sheep.forEach(s => {
-      // First priority: flee from nearby wolves (survival instinct)
+      // Grazing pause: sheep that just ate (low hunger + high energy) don't move unless threatened
+      // This makes them easier targets for wolves, creating realistic predator-prey dynamics
+      const justAte = s.hunger <= 1 && s.energy > 0.8
+      
+      // Always flee from nearby wolves regardless of grazing state (survival instinct)
       const nearbyWolves = this.findNearbyOrganisms(s.x, s.y, 6, 'wolf') as Wolf[]
       if (nearbyWolves.length > 0) {
         // Move away from the nearest wolf (use full movement range for escape)
@@ -201,6 +206,11 @@ export class StepProcessor {
             return
           }
         }
+      }
+      
+      // If sheep just ate, they pause to graze (unless fleeing above)
+      if (justAte) {
+        return // Skip movement - sheep is grazing
       }
       
       // Second priority: If sheep is hungry, try to find grass nearby
@@ -302,9 +312,10 @@ export class StepProcessor {
         
         const distance = Math.sqrt((target.x - w.x) ** 2 + (target.y - w.y) ** 2)
         
-        if (distance <= 1) {
+        
+        if (distance <= 3) {
           // Eat the sheep
-          console.log(`🍖 WOLF HUNT SUCCESS: ${w.id} caught sheep ${target.id} at step ${this.currentStep} (energy: ${w.energy.toFixed(2)} -> ${(w.energy + this.config.wolf.energyPerSheep).toFixed(2)}, hunger: ${w.hunger} -> 0)`)
+          // console.log(`🍖 WOLF HUNT SUCCESS: ${w.id} caught sheep ${target.id} at step ${this.currentStep}`)
           this.world.recordDeath(target, 'hunting', `Hunted by wolf ${w.id}`)
           // Only remove the sheep, keep other organisms in the cell
           const cell = this.world.getCell(target.x, target.y)
