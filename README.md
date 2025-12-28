@@ -2,6 +2,8 @@
 
 A dynamic ecosystem simulation featuring emergent population oscillations through natural resource depletion and recovery cycles. Watch as grass, sheep, and wolves create realistic predator-prey dynamics without artificial mechanisms. Built with Next.js, React, Redux, and TypeScript.
 
+<img width="1227" height="897" alt="image" src="https://github.com/user-attachments/assets/ab195557-2ee9-477c-aaa7-37541826552a" />
+
 ![Ecosystem Simulation](https://img.shields.io/badge/Status-Active%20Development-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15.5+-black)
