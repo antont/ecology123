@@ -24,7 +24,7 @@ interface Run {
   peaks: number[]
 }
 
-let runs: Run[] = []
+const runs: Run[] = []
 
 /** Long synchronous runs starve the test worker's RPC; let it breathe between seeds. */
 const yieldToLoop = () => new Promise(resolve => setImmediate(resolve))

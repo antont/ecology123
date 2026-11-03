@@ -1,3 +1,11 @@
+## 2026-11-03
+
+- 🔄 - Rewrote the simulation core as a small deterministic model in src/sim (seeded RNG, torus grid, one shuffled update pass)
+- 🐛 - Replaced the old engine, which collapsed to total extinction by step ~300 in every seed
+- 📊 - Added multi-seed ecology and robustness suites: coexistence, bounded sheep, sustained cycles, wolf lag
+- 📱 - Rewired the page to the new core with a replayable seed and a capped animation loop
+- 📦 - Removed unused Redux dependencies, the observability dashboard and stale work-log docs
+
 ## 2025-09-30
 
 - 🎯 - Implemented grazing pause mechanic: sheep stop moving after eating, making them vulnerable to wolves
