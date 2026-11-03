@@ -12,6 +12,8 @@ interface PopulationData {
 
 interface PopulationDashboardProps {
   data: PopulationData[]
+  /** How many of the most recent steps the chart shows. */
+  chartWindow?: number
   currentStats: {
     step: number
     grass: number
@@ -22,7 +24,8 @@ interface PopulationDashboardProps {
 
 export const PopulationDashboard: React.FC<PopulationDashboardProps> = ({ 
   data, 
-  currentStats 
+  currentStats,
+  chartWindow
 }) => {
   // Calculate some basic metrics
   const totalSteps = data.length
@@ -50,7 +53,7 @@ export const PopulationDashboard: React.FC<PopulationDashboardProps> = ({
     <div className="h-full flex flex-col space-y-4">
       {/* Population Chart */}
       <div className="flex-1">
-        <PopulationChart data={data} />
+        <PopulationChart data={data} maxDataPoints={chartWindow} />
       </div>
 
       {/* Metrics Summary */}
