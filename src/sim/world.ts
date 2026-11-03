@@ -1,4 +1,4 @@
-import type { SimConfig } from './config'
+import { validateConfig, type SimConfig } from './config'
 import { cellIndex } from './grid'
 import { createRng, type Rng } from './rng'
 import { runSheepPhase } from './rules/sheep'
@@ -77,6 +77,9 @@ export class World implements Simulation {
   private latest: StepStats
 
   constructor(config: SimConfig, seed: number) {
+    // A config built by hand rather than with createConfig must still be sane:
+    // too many initial animals would otherwise make placement loop forever
+    validateConfig(config)
     this.config = config
     this.width = config.width
     this.height = config.height
@@ -191,29 +194,45 @@ export class World implements Simulation {
    * so no cell is visited twice when the radius exceeds half the grid.
    */
   nearest(species: Species, x: number, y: number, radius: number): Animal | null {
-    const grid = this.gridOf(species)
-    const [loX, hiX] = this.span(radius, this.width)
-    const [loY, hiY] = this.span(radius, this.height)
     let best: Animal[] = []
     let bestDistance = Infinity
-    for (let dy = loY; dy <= hiY; dy++) {
-      for (let dx = loX; dx <= hiX; dx++) {
-        const animal = grid[cellIndex(this, x + dx, y + dy)]
-        if (!animal) continue
-        const d = Math.max(Math.abs(dx), Math.abs(dy))
-        if (d < bestDistance) {
-          bestDistance = d
-          best = [animal]
-        } else if (d === bestDistance) {
-          best.push(animal)
-        }
+    this.scan(species, x, y, radius, (animal, d) => {
+      if (d < bestDistance) {
+        bestDistance = d
+        best = [animal]
+      } else if (d === bestDistance) {
+        best.push(animal)
       }
-    }
+    })
     if (best.length === 0) return null
     return best.length === 1 ? best[0] : this.rng.pick(best)
   }
 
+  /** Every living animal of `species` within `radius` (torus distance) of (x, y). */
+  within(species: Species, x: number, y: number, radius: number): Animal[] {
+    const found: Animal[] = []
+    this.scan(species, x, y, radius, animal => found.push(animal))
+    return found
+  }
+
   // ---- internals -----------------------------------------------------------
+
+  /**
+   * Visits each occupied cell in the square of `radius` around (x, y) once, with
+   * its distance. The square is clamped so no cell is visited twice when the
+   * radius exceeds half the grid.
+   */
+  private scan(species: Species, x: number, y: number, radius: number, visit: (animal: Animal, distance: number) => void): void {
+    const grid = this.gridOf(species)
+    const [loX, hiX] = this.span(radius, this.width)
+    const [loY, hiY] = this.span(radius, this.height)
+    for (let dy = loY; dy <= hiY; dy++) {
+      for (let dx = loX; dx <= hiX; dx++) {
+        const animal = grid[cellIndex(this, x + dx, y + dy)]
+        if (animal) visit(animal, Math.max(Math.abs(dx), Math.abs(dy)))
+      }
+    }
+  }
 
   private span(radius: number, size: number): [number, number] {
     const r = Math.min(radius, Math.floor(size / 2))

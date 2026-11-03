@@ -40,11 +40,11 @@ function chooseMove(world: World, sheep: Animal): Cell {
   const candidates = neighbours(world, sheep.x, sheep.y, true).filter(([cx, cy]) =>
     (cx === sheep.x && cy === sheep.y) || (!world.sheepAt(cx, cy) && !world.wolfAt(cx, cy)))
 
-  const threat = world.nearest('wolf', sheep.x, sheep.y, p.vision)
-  if (threat) {
-    // Farthest from the wolf first; among equally safe cells, the grassiest
-    return best(world, candidates, ([cx, cy]) =>
-      [torusDistance(world, cx, cy, threat.x, threat.y), world.grassAt(cx, cy)])
+  const threats = world.within('wolf', sheep.x, sheep.y, p.vision)
+  if (threats.length > 0) {
+    // Farthest from whichever visible wolf is nearest to that cell; then the grassiest
+    const safety = ([cx, cy]: Cell) => Math.min(...threats.map(w => torusDistance(world, cx, cy, w.x, w.y)))
+    return best(world, candidates, cell => [safety(cell), world.grassAt(cell[0], cell[1])])
   }
   if (world.rng.next() < p.wander) return world.rng.pick(candidates)
   return best(world, candidates, ([cx, cy]) => [world.grassAt(cx, cy)])

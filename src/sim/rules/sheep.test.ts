@@ -85,6 +85,19 @@ describe('sheep phase', () => {
     }
   })
 
+  it('flees the nearest wolf from each cell, not into a second wolf', () => {
+    for (const seed of seeds(20)) {
+      const sim = world({ sheep: { vision: 2 }, wolf: { vision: 1 } }, seed)
+      for (let i = 0; i < 49; i++) sim.setGrass(i % 7, Math.floor(i / 7), 0.5)
+      const sheep = sim.addSheep(3, 3, { energy: 5 })
+      sim.addWolf(1, 3)
+      sim.addWolf(5, 3)
+      sim.step()
+      // Stepping sideways (x=2 or 4) would put it next to one of the wolves
+      expect(sheep.x, `seed ${seed}`).toBe(3)
+    }
+  })
+
   it('wanders at random when wander is 1', () => {
     const ends = new Set<string>()
     for (const seed of seeds(40)) {

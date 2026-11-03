@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createEmptySimulation, createSimulation, defaultConfig } from './index'
+import { ConfigError, createEmptySimulation, createSimulation, defaultConfig } from './index'
 import { cellIndex } from './grid'
 import { tinyConfig } from './test/helpers'
 
@@ -80,6 +80,16 @@ describe('world', () => {
     expect(sim.stats.sheep).toBe(1)
     expect(sim.stats.wolves).toBe(1)
   })
+
+  it('rejects an invalid config instead of building a broken world', () => {
+    const bad = { ...defaultConfig, width: 2 }
+    expect(() => createEmptySimulation(bad, 1)).toThrow(ConfigError)
+  })
+
+  it('rejects more initial animals than cells instead of hanging', () => {
+    const crowded = { ...defaultConfig, width: 3, height: 3, sheep: { ...defaultConfig.sheep, initial: 10 } }
+    expect(() => createSimulation(crowded, 1)).toThrow(ConfigError)
+  }, 2000)
 
   it('ids are unique and deterministic', () => {
     const ids = (seed: number) => {

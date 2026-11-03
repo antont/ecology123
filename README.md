@@ -34,7 +34,7 @@ Each step runs in this order:
 2. **Sheep** act in shuffled order. Each sheep:
    1. ages and pays `metabolism`, and dies of old age at `maxAge` or of starvation at zero energy;
    2. moves one cell (or stays):
-      - if it can see a wolf within `vision`, it moves to the cell farthest from that wolf;
+      - if it can see a wolf within `vision`, it moves to the cell farthest from the nearest visible wolf;
       - otherwise, with probability `wander`, it moves to a random cell;
       - otherwise it moves to the grassiest cell;
       - it never moves onto another sheep or a wolf;
@@ -71,7 +71,7 @@ These values were chosen by sweeping wolf parameters across many seeds. Wolves t
 - **Coexistence:** both species are alive after 3000 steps in at least 9 of 10 seeds.
 - **No sheep carpet:** sheep never exceed 30% of cells.
 - **Cycles:** at least 10 sheep population cycles per surviving run.
-- **Wolves follow sheep:** wolf peaks lag sheep peaks by more than 0 and less than half a cycle. Typically the lag is about 40 steps on a cycle of about 135.
+- **Wolves follow sheep:** wolf peaks lag sheep peaks by more than 0 and less than half a cycle.
 - **Robustness:** with each of 8 key parameters scaled by ×0.8 or ×1.2, both species still coexist in at least 4 of 5 seeds.
 - **Speed:** 3000 steps run in under 3 seconds.
 
