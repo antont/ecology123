@@ -128,8 +128,9 @@ export class World implements Simulation {
 
     this.sheepList = this.sheepList.filter(a => a.alive)
     this.wolfList = this.wolfList.filter(a => a.alive)
+    // A sheep born this step may already have been eaten by a wolf
     for (const child of this.born) {
-      (child.species === 'sheep' ? this.sheepList : this.wolfList).push(child)
+      if (child.alive) (child.species === 'sheep' ? this.sheepList : this.wolfList).push(child)
     }
     this.born = []
 
