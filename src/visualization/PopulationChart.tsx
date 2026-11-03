@@ -83,6 +83,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               stroke="#22c55e" 
               strokeWidth={2}
               dot={false}
+              isAnimationActive={false}
               name="grass"
               yAxisId="grass"
             />
@@ -92,6 +93,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               stroke="#6b7280" 
               strokeWidth={2}
               dot={false}
+              isAnimationActive={false}
               name="sheep"
               yAxisId="animals"
             />
@@ -101,6 +103,7 @@ export const PopulationChart: React.FC<PopulationChartProps> = ({
               stroke="#ef4444" 
               strokeWidth={2}
               dot={false}
+              isAnimationActive={false}
               name="wolves"
               yAxisId="animals"
             />

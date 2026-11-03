@@ -120,7 +120,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({ cellSize = 7 }) 
   const speedPercent = ((speed - uiConfig.speed.min) / (uiConfig.speed.max - uiConfig.speed.min)) * 100
 
   return (
-    <div className="w-full h-screen flex flex-col">
+    <div className="w-full h-full flex flex-col">
       <div className="flex-shrink-0 mb-2">
         <div className="grid grid-cols-4 gap-1 text-center">
           <div className="bg-gray-100 p-1.5 rounded shadow-sm">
@@ -152,7 +152,7 @@ export const SimulationGrid: React.FC<SimulationGridProps> = ({ cellSize = 7 }) 
             style={{ imageRendering: 'pixelated', maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
           />
         </div>
-        <div className="w-[500px] flex-shrink-0">
+        <div className="w-[500px] flex-shrink-0 overflow-y-auto">
           <PopulationDashboard data={history} currentStats={point} chartWindow={uiConfig.chartWindow} />
         </div>
       </div>
