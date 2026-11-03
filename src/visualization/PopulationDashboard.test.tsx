@@ -4,8 +4,8 @@ import { PopulationDashboard } from './PopulationDashboard'
 
 // Mock PopulationChart component
 vi.mock('./PopulationChart', () => ({
-  PopulationChart: ({ data }: { data: unknown[] }) => (
-    <div data-testid="population-chart" data-points={data.length}>
+  PopulationChart: ({ data, maxDataPoints }: { data: unknown[]; maxDataPoints?: number }) => (
+    <div data-testid="population-chart" data-points={data.length} data-window={maxDataPoints}>
       Chart with {data.length} data points
     </div>
   ),
@@ -32,6 +32,11 @@ describe('PopulationDashboard', () => {
     
     expect(screen.getByTestId('population-chart')).toBeInTheDocument()
     expect(screen.getByTestId('population-chart')).toHaveAttribute('data-points', '5')
+  })
+
+  it('passes its chart window through to the chart', () => {
+    render(<PopulationDashboard data={mockData} currentStats={mockCurrentStats} chartWindow={600} />)
+    expect(screen.getByTestId('population-chart')).toHaveAttribute('data-window', '600')
   })
 
   it('should calculate and display ecosystem metrics correctly', () => {

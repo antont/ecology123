@@ -9,8 +9,8 @@ vi.mock('recharts', () => ({
       {children}
     </div>
   ),
-  Line: ({ dataKey, stroke, name }: { dataKey: string; stroke: string; name: string }) => (
-    <div data-testid={`line-${name}`} data-stroke={stroke} data-key={dataKey} />
+  Line: ({ dataKey, stroke, name, isAnimationActive }: { dataKey: string; stroke: string; name: string; isAnimationActive?: boolean }) => (
+    <div data-testid={`line-${name}`} data-stroke={stroke} data-key={dataKey} data-animated={String(isAnimationActive)} />
   ),
   XAxis: ({ dataKey }: { dataKey: string }) => <div data-testid="x-axis" data-key={dataKey} />,
   YAxis: () => <div data-testid="y-axis" />,
@@ -97,6 +97,14 @@ describe('PopulationChart', () => {
     expect(chartData).toHaveLength(5)
     expect(chartData[0]).toEqual({ step: 0, grass: 100, sheep: 20, wolves: 5 })
     expect(chartData[4]).toEqual({ step: 4, grass: 120, sheep: 10, wolves: 3 })
+  })
+
+  it('draws lines without entry animation, so they show while data streams in', () => {
+    // Recharts restarts the animation on every data change; at 30 steps/s the lines never appear
+    render(<PopulationChart data={mockData} />)
+    for (const name of ['grass', 'sheep', 'wolves']) {
+      expect(screen.getByTestId(`line-${name}`)).toHaveAttribute('data-animated', 'false')
+    }
   })
 
   it('should render chart controls', () => {

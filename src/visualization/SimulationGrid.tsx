@@ -1,388 +1,248 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
-import { SimulationEngine } from '../simulation/engine/SimulationEngine'
-import { WORLD_CONFIG } from '../simulation/config/WorldConfig'
-import { WorldCell, Grass, Sheep, Wolf, PopulationHealth, EcosystemAlert, ExtinctionAnalysis, OscillationAnalysis } from '../simulation/types/SimulationTypes'
-import { WorldInitializer } from '../simulation/utils/WorldInitializer'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { createSimulation, defaultConfig, type Simulation, type StepStats } from '../sim'
+import { appendCapped, parseSeed, randomSeed, stepsDue } from './loop'
+import { uiConfig } from './uiConfig'
 import styles from './SpeedControl.module.css'
 import { PopulationDashboard } from './PopulationDashboard'
-import { ObservabilityDashboard } from './ObservabilityDashboard'
 
 interface SimulationGridProps {
-  width?: number
-  height?: number
   cellSize?: number
 }
 
-export const SimulationGrid: React.FC<SimulationGridProps> = ({
-  width = WORLD_CONFIG.width,
-  height = WORLD_CONFIG.height,
-  cellSize = 12
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number | null>(null)
-  const lastStepTime = useRef<number>(0)
-  
-  const [simulation, setSimulation] = useState<SimulationEngine | null>(null)
-  const [isRunning, setIsRunning] = useState(false)
-  const [speed, setSpeed] = useState<number>(WORLD_CONFIG.speed.defaultSpeed)
-  const [stats, setStats] = useState({
-    step: 0,
-    grass: 0,
-    sheep: 0,
-    wolves: 0
-  })
-  const [populationData, setPopulationData] = useState<Array<{
-    step: number
-    grass: number
-    sheep: number
-    wolves: number
-  }>>([])
-  const [showObservability, setShowObservability] = useState(false)
-  const [populationHealth, setPopulationHealth] = useState<PopulationHealth[]>([])
-  const [ecosystemAlerts, setEcosystemAlerts] = useState<EcosystemAlert[]>([])
-  const [extinctionAnalysis, setExtinctionAnalysis] = useState<ExtinctionAnalysis | null>(null)
-  const [oscillationAnalysis, setOscillationAnalysis] = useState<OscillationAnalysis>({
-    totalCycles: 0,
-    cyclesBySpecies: {},
-    averageCycleDuration: 0,
-    averageAmplitude: 0,
-    oscillationHealth: 'extinct',
-    recentCycles: [],
-    nearExtinctionRecoveries: 0,
-    overgrowthCorrections: 0,
-    stabilityScore: 0
-  })
+interface PopulationPoint {
+  step: number
+  grass: number
+  sheep: number
+  wolves: number
+}
 
-  useEffect(() => {
-    // Initialize simulation
-    const sim = new SimulationEngine(WORLD_CONFIG)
-    setSimulation(sim)
-    
-    // Initialize world with some organisms
-    initializeWorld(sim)
-    
-    return () => {
-      sim.destroy()
+const toPoint = (s: StepStats): PopulationPoint => ({
+  step: s.step, grass: Math.round(s.grass), sheep: s.sheep, wolves: s.wolves,
+})
+
+function draw(canvas: HTMLCanvasElement | null, sim: Simulation, cellSize: number) {
+  const ctx = canvas?.getContext('2d')
+  if (!ctx) return
+  for (let y = 0; y < sim.height; y++) {
+    for (let x = 0; x < sim.width; x++) {
+      const g = sim.grass[y * sim.width + x]
+      ctx.fillStyle = `rgb(20, ${Math.round(40 + 180 * g)}, 20)`
+      ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize)
     }
+  }
+  const inset = cellSize >= 4 ? 1 : 0
+  ctx.fillStyle = '#ffffff'
+  for (const s of sim.sheep) ctx.fillRect(s.x * cellSize + inset, s.y * cellSize + inset, cellSize - 2 * inset, cellSize - 2 * inset)
+  ctx.fillStyle = '#8b0000'
+  for (const w of sim.wolves) ctx.fillRect(w.x * cellSize + inset, w.y * cellSize + inset, cellSize - 2 * inset, cellSize - 2 * inset)
+  if (cellSize >= 6) {
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)'
+    ctx.lineWidth = 0.5
+    for (let x = 0; x <= sim.width; x++) {
+      ctx.beginPath(); ctx.moveTo(x * cellSize, 0); ctx.lineTo(x * cellSize, sim.height * cellSize); ctx.stroke()
+    }
+    for (let y = 0; y <= sim.height; y++) {
+      ctx.beginPath(); ctx.moveTo(0, y * cellSize); ctx.lineTo(sim.width * cellSize, y * cellSize); ctx.stroke()
+    }
+  }
+}
+
+export const SimulationGrid: React.FC<SimulationGridProps> = ({ cellSize = 7 }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const simRef = useRef<Simulation | null>(null)
+
+  const [seed, setSeed] = useState<number | null>(null)
+  const [seedInput, setSeedInput] = useState('')
+  const [stats, setStats] = useState<StepStats | null>(null)
+  const [history, setHistory] = useState<PopulationPoint[]>([])
+  const [running, setRunning] = useState(false)
+  const [speed, setSpeed] = useState(uiConfig.speed.default)
+
+  const start = useCallback((nextSeed: number) => {
+    const sim = createSimulation(defaultConfig, nextSeed)
+    simRef.current = sim
+    setSeed(nextSeed)
+    setSeedInput(String(nextSeed))
+    setStats(sim.stats)
+    setHistory([toPoint(sim.stats)])
   }, [])
 
-  const initializeWorld = (sim: SimulationEngine) => {
-    const world = sim.getWorld()
-    
-    // Use centralized initialization with production config
-    WorldInitializer.createProductionEcosystem(world, WORLD_CONFIG)
-    
-    // Update UI statistics
-    updateStats(sim)
-  }
-
-  const drawGrid = () => {
-    if (!simulation || !canvasRef.current) return
-    
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    
-    const world = simulation.getWorld()
-    const cells = world.getCells()
-    
-    // Clear canvas
-    ctx.fillStyle = '#2d3748' // Dark background
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-    
-    // Draw grid
-    ctx.strokeStyle = '#4a5568'
-    ctx.lineWidth = 0.5
-    
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const cell = cells[x][y]
-        const pixelX = x * cellSize
-        const pixelY = y * cellSize
-        
-        // Draw cell background
-        if (cell.grass) {
-          const intensity = Math.floor(cell.grass.density * 255)
-          ctx.fillStyle = `rgb(0, ${intensity}, 0)` // Green for grass
-          ctx.fillRect(pixelX, pixelY, cellSize, cellSize)
-        }
-        
-        // Draw organisms
-        if (cell.sheep) {
-          ctx.fillStyle = '#ffffff' // White for sheep
-          ctx.fillRect(pixelX + 1, pixelY + 1, cellSize - 2, cellSize - 2)
-        }
-        
-        if (cell.wolf) {
-          ctx.fillStyle = '#8b0000' // Dark red for wolves
-          ctx.fillRect(pixelX + 1, pixelY + 1, cellSize - 2, cellSize - 2)
-        }
-        
-        // Draw grid lines
-        ctx.strokeRect(pixelX, pixelY, cellSize, cellSize)
-      }
+  const advance = useCallback((steps: number) => {
+    const sim = simRef.current
+    if (!sim || steps <= 0) return
+    const points: PopulationPoint[] = []
+    for (let i = 0; i < steps; i++) {
+      sim.step()
+      points.push(toPoint(sim.stats))
     }
-  }
+    setStats(sim.stats)
+    setHistory(prev => points.reduce((acc, p) => appendCapped(acc, p, uiConfig.historyCap), prev))
+  }, [])
 
-  const updateStats = (sim: SimulationEngine) => {
-    const worldStats = sim.getStatistics()
-    const currentStep = sim.getCurrentStep()
-    const newStats = {
-      step: currentStep,
-      grass: worldStats.grassCount,
-      sheep: worldStats.sheepCount,
-      wolves: worldStats.wolfCount
-    }
-    
-    setStats(newStats)
-    
-    // Add to population data for charting
-    setPopulationData(prev => [...prev, newStats])
-    
-    // Update observability data
-    setPopulationHealth(sim.getPopulationHealth())
-    setEcosystemAlerts(sim.getEcosystemAlerts())
-    setExtinctionAnalysis(sim.getExtinctionAnalysis())
-    setOscillationAnalysis(sim.getOscillationAnalysis())
-  }
-
-  const stepSimulation = () => {
-    if (!simulation) return
-    
-    simulation.step()
-    drawGrid()
-    updateStats(simulation)
-  }
-
-  const toggleSimulation = () => {
-    if (!simulation) return
-    
-    if (isRunning) {
-      simulation.pause()
-      setIsRunning(false)
-    } else {
-      simulation.start()
-      setIsRunning(true)
-    }
-  }
-
-  // Animation loop that runs continuously with speed control
-  useEffect(() => {
-    if (!simulation) return
-
-    const animate = (currentTime: number) => {
-      if (simulation.isRunning()) {
-        // Calculate time-based stepping based on speed
-        const timeSinceLastStep = currentTime - lastStepTime.current
-        const stepInterval = 1000 / speed // Convert steps per second to milliseconds
-        
-        if (timeSinceLastStep >= stepInterval) {
-          if (!simulation.isPaused()) {
-            simulation.step()
-            lastStepTime.current = currentTime
-            // Only update stats when a step actually occurs
-            updateStats(simulation)
-          }
-        }
-        
-        // Always update display (smooth animation)
-        drawGrid()
-      }
-      
-      animationRef.current = requestAnimationFrame(animate)
-    }
-    
-    // Start animation loop
-    animationRef.current = requestAnimationFrame(animate)
-    
-    // Cleanup
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-    }
-  }, [simulation, speed])
-
-  const resetSimulation = () => {
-    if (!simulation) return
-    
-    simulation.reset()
-    initializeWorld(simulation)
-    drawGrid()
-    updateStats(simulation)
-    setPopulationData([]) // Clear population data on reset
-  }
-
-  const handleSpeedChange = (newSpeed: number) => {
-    setSpeed(newSpeed)
-    // Reset timing to avoid immediate step after speed change
-    lastStepTime.current = performance.now()
-  }
+  // Seed on the client only, so server and client renders agree
+  useEffect(() => { start(randomSeed()) }, [start])
 
   useEffect(() => {
-    drawGrid()
-  }, [simulation])
+    if (simRef.current) draw(canvasRef.current, simRef.current, cellSize)
+  }, [stats, cellSize])
+
+  useEffect(() => {
+    if (!running) return
+    const interval = 1000 / speed
+    let frame = 0
+    let last = performance.now()
+    let owed = 0
+    const tick = (now: number) => {
+      owed += now - last
+      last = now
+      const steps = stepsDue(owed, speed, uiConfig.maxStepsPerFrame)
+      // Drop any backlog beyond one step, e.g. after the tab was hidden
+      owed = Math.min(owed - steps * interval, interval)
+      advance(steps)
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [running, speed, advance])
+
+  const parsedSeed = parseSeed(seedInput)
+  const reset = () => {
+    const next = parsedSeed ?? seed
+    if (next !== null) start(next)
+  }
+
+  const width = defaultConfig.width
+  const height = defaultConfig.height
+  const current = stats ?? { step: 0, grass: 0, sheep: 0, wolves: 0 }
+  const point = { step: current.step, grass: Math.round(current.grass), sheep: current.sheep, wolves: current.wolves }
+  const speedPercent = ((speed - uiConfig.speed.min) / (uiConfig.speed.max - uiConfig.speed.min)) * 100
 
   return (
-    <div className="w-full h-screen flex flex-col">
-      {/* Compact Statistics at the top */}
+    <div className="w-full h-full flex flex-col">
       <div className="flex-shrink-0 mb-2">
         <div className="grid grid-cols-4 gap-1 text-center">
           <div className="bg-gray-100 p-1.5 rounded shadow-sm">
             <div className="text-xs text-gray-600">Step</div>
-            <div className="text-sm font-bold">{stats.step}</div>
+            <div className="text-sm font-bold" data-testid="stat-step">{point.step}</div>
           </div>
           <div className="bg-green-100 p-1.5 rounded shadow-sm">
             <div className="text-xs text-gray-600">Grass</div>
-            <div className="text-sm font-bold text-green-600">{stats.grass}</div>
+            <div className="text-sm font-bold text-green-600" data-testid="stat-grass">{point.grass}</div>
           </div>
           <div className="bg-white p-1.5 rounded shadow-sm border">
             <div className="text-xs text-gray-600">Sheep</div>
-            <div className="text-sm font-bold text-gray-700">{stats.sheep}</div>
+            <div className="text-sm font-bold text-gray-700" data-testid="stat-sheep">{point.sheep}</div>
           </div>
           <div className="bg-red-100 p-1.5 rounded shadow-sm">
             <div className="text-xs text-gray-600">Wolves</div>
-            <div className="text-sm font-bold text-red-600">{stats.wolves}</div>
+            <div className="text-sm font-bold text-red-600" data-testid="stat-wolves">{point.wolves}</div>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area - Simulation Grid + Dashboard */}
       <div className="flex-1 flex gap-4 mb-2 min-h-0" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-        {/* Simulation Grid */}
         <div className="flex-1 flex items-center justify-center">
-          <div className="relative w-full h-full flex items-center justify-center">
-            <canvas
-              ref={canvasRef}
-              width={width * cellSize}
-              height={height * cellSize}
-              className="border border-gray-300 rounded shadow-lg"
-              style={{ 
-                imageRendering: 'pixelated',
-                maxWidth: '100%',
-                maxHeight: '100%',
-                width: 'auto',
-                height: 'auto'
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Population Dashboard */}
-        <div className="w-[500px] flex-shrink-0">
-          <PopulationDashboard 
-            data={populationData}
-            currentStats={stats}
+          <canvas
+            ref={canvasRef}
+            width={width * cellSize}
+            height={height * cellSize}
+            className="border border-gray-300 rounded shadow-lg"
+            style={{ imageRendering: 'pixelated', maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
           />
         </div>
+        <div className="w-[500px] flex-shrink-0 overflow-y-auto">
+          <PopulationDashboard data={history} currentStats={point} chartWindow={uiConfig.chartWindow} />
+        </div>
       </div>
 
-      {/* Compact Legend */}
       <div className="flex-shrink-0 mb-2 text-xs text-gray-600 text-center">
         <span className="font-semibold">Legend:</span>
-        <span className="ml-2">🟢 Grass (darker = denser) • ⚪ Sheep • 🔴 Wolves</span>
+        <span className="ml-2">🟢 Grass (brighter = more) • ⚪ Sheep • 🔴 Wolves</span>
       </div>
 
-      {/* Compact Integrated Control Panel */}
       <div className="flex-shrink-0 bg-white rounded shadow border border-gray-200 p-2">
-        <div className="flex items-center justify-between gap-3">
-          {/* Playback Controls */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-1">
             <button
-              onClick={toggleSimulation}
+              aria-label={running ? 'Pause' : 'Play'}
+              onClick={() => setRunning(r => !r)}
               className={`px-2 py-1 rounded font-semibold text-white text-xs transition-colors ${
-                isRunning 
-                  ? 'bg-red-500 hover:bg-red-600' 
-                  : 'bg-green-500 hover:bg-green-600'
+                running ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
               }`}
             >
-              {isRunning ? '⏸️' : '▶️'}
+              {running ? '⏸️' : '▶️'}
             </button>
-            
             <button
-              onClick={stepSimulation}
+              aria-label="Step"
+              onClick={() => advance(1)}
               className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded text-xs transition-colors"
             >
               ⏭️
             </button>
-            
             <button
-              onClick={resetSimulation}
+              aria-label="Reset"
+              onClick={reset}
               className="px-2 py-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded text-xs transition-colors"
             >
               🔄
             </button>
           </div>
 
-          {/* Speed Control - Ultra Compact */}
-          <div className="flex items-center gap-2 flex-1 max-w-sm">
-            <span className="text-xs font-medium text-gray-700 whitespace-nowrap">Speed:</span>
-            <span className="text-xs font-bold text-blue-600 whitespace-nowrap">
-              {speed < 1 ? `${speed.toFixed(1)}x` : speed >= 60 ? '∞' : `${Math.round(speed)}x`}
-            </span>
-            
+          <div className="flex items-center gap-1 text-xs">
+            <label htmlFor="seed" className="font-medium text-gray-700">Seed</label>
             <input
-              type="range"
-              min={WORLD_CONFIG.speed.minSpeed}
-              max={WORLD_CONFIG.speed.maxSpeed}
-              step="0.1"
-              value={speed}
-              onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-              disabled={!isRunning}
-              className={`flex-1 h-1 bg-gray-200 rounded appearance-none cursor-pointer ${styles.slider}`}
-              style={{
-                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
-                  ((speed - WORLD_CONFIG.speed.minSpeed) / (WORLD_CONFIG.speed.maxSpeed - WORLD_CONFIG.speed.minSpeed)) * 100
-                }%, #e5e7eb ${
-                  ((speed - WORLD_CONFIG.speed.minSpeed) / (WORLD_CONFIG.speed.maxSpeed - WORLD_CONFIG.speed.minSpeed)) * 100
-                }%, #e5e7eb 100%)`
-              }}
+              id="seed"
+              value={seedInput}
+              onChange={e => setSeedInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') reset() }}
+              aria-invalid={parsedSeed === null}
+              inputMode="numeric"
+              className={`w-28 px-1 py-0.5 border rounded font-mono ${parsedSeed === null ? 'border-red-500' : 'border-gray-300'}`}
             />
-            
-            <div className="text-xs text-gray-500 whitespace-nowrap">
-              {speed.toFixed(1)}/s
-            </div>
+            <button
+              aria-label="New random seed"
+              onClick={() => start(randomSeed())}
+              className="px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded"
+            >
+              🎲
+            </button>
           </div>
 
-          {/* Speed Presets - Ultra Compact */}
+          <div className="flex items-center gap-2 flex-1 max-w-sm">
+            <label htmlFor="speed" className="text-xs font-medium text-gray-700 whitespace-nowrap">Speed</label>
+            <input
+              id="speed"
+              type="range"
+              min={uiConfig.speed.min}
+              max={uiConfig.speed.max}
+              step="0.5"
+              value={speed}
+              onChange={e => setSpeed(parseFloat(e.target.value))}
+              className={`flex-1 h-1 bg-gray-200 rounded appearance-none cursor-pointer ${styles.slider}`}
+              style={{
+                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${speedPercent}%, #e5e7eb ${speedPercent}%, #e5e7eb 100%)`,
+              }}
+            />
+            <span className="text-xs text-gray-500 whitespace-nowrap">{speed} steps/s</span>
+          </div>
+
           <div className="flex gap-0.5">
-            {Object.entries(WORLD_CONFIG.speed.presets).map(([name, value]) => (
+            {Object.entries(uiConfig.speed.presets).map(([name, value]) => (
               <button
                 key={name}
-                onClick={() => handleSpeedChange(value)}
+                onClick={() => setSpeed(value)}
                 className={`px-1.5 py-0.5 text-xs rounded transition-colors ${
-                  Math.abs(speed - value) < 0.1
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  speed === value ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
-                disabled={!isRunning}
-                title={`${name === 'verySlow' ? 'Very Slow' :
-                        name === 'veryFast' ? 'Very Fast' :
-                        name.charAt(0).toUpperCase() + name.slice(1)} (${value}x)`}
               >
-                {name === 'verySlow' ? '0.5x' :
-                 name === 'slow' ? '1x' :
-                 name === 'normal' ? '2x' :
-                 name === 'fast' ? '5x' :
-                 name === 'veryFast' ? '10x' :
-                 name === 'unlimited' ? '∞' : value + 'x'}
+                {name}
               </button>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Observability Dashboard */}
-      <ObservabilityDashboard
-        populationHealth={populationHealth}
-        alerts={ecosystemAlerts}
-        extinctionAnalysis={extinctionAnalysis}
-        oscillationAnalysis={oscillationAnalysis}
-        isVisible={showObservability}
-        onToggle={() => setShowObservability(!showObservability)}
-      />
     </div>
   )
 }

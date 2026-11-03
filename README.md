@@ -1,259 +1,91 @@
-# 🌿 Ecological Simulation: Natural Boom-Bust Dynamics
+# Ecological Simulation: grass, sheep and wolves
 
-A dynamic ecosystem simulation featuring emergent population oscillations through natural resource depletion and recovery cycles. Watch as grass, sheep, and wolves create realistic predator-prey dynamics without artificial mechanisms. Built with Next.js, React, Redux, and TypeScript.
+A small agent-based ecosystem in the browser. Grass regrows, sheep graze it, and wolves hunt the sheep. Predator-prey cycles come purely from each creature's own rules: sheep boom, wolves follow, sheep crash, wolves starve back, grass recovers, and the cycle repeats for thousands of steps. Nothing forces or rescues a population.
 
 <img width="1227" height="897" alt="image" src="https://github.com/user-attachments/assets/ab195557-2ee9-477c-aaa7-37541826552a" />
 
-![Ecosystem Simulation](https://img.shields.io/badge/Status-Active%20Development-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
-![Next.js](https://img.shields.io/badge/Next.js-15.5+-black)
-![Testing](https://img.shields.io/badge/Testing-Vitest%20%2B%20Playwright-orange)
+*(Screenshot of an earlier version.)*
 
-## 🎯 **Project Overview**
+## Running it
 
-This simulation demonstrates fundamental ecological principles through a three-level food chain:
-- **🌱 Grass** (Producers): Grow, spread seeds, compete for space
-- **🐑 Sheep** (Primary Consumers): Graze grass, reproduce when well-fed, form flocks
-- **🐺 Wolves** (Secondary Consumers): Hunt sheep, form packs, territorial behavior
-
-The system exhibits **emergent boom-bust oscillations** that arise naturally from resource competition and energy-dependent reproduction, creating realistic population cycles without any artificial oscillation mechanisms.
-
-## 🔬 **Ecological Features**
-
-### **Natural Boom-Bust Cycles**
-```
-Sheep Boom → Grass Depletion → Sheep Crash → Grass Recovery → Sheep Recovery
-    ↓             ↓                ↓            ↑             ↑
-Wolf Growth → Wolf Feeding → Wolf Starvation → Wolf Decline → Cycle Repeats
-```
-
-**Key Insight**: Oscillations emerge purely from organism behavior - no artificial timers or forced cycles!
-
-### **🐑 Sheep Behavior (Natural Boom-Bust Drivers)**
-- **Energy-Dependent Reproduction**: Only reproduce when energy ≥ 0.35 (well-fed)
-- **Quadratic Energy Scaling**: Low energy severely reduces fertility (creates crashes)
-- **Rapid Consumption**: Deplete 0.8 grass density per feeding (enables overgrazing)
-- **Moderate Energy Cost**: 0.03 energy/step (survive well when grass abundant)
-- **Quick Recovery**: Short gestation (5 steps) enables rapid population booms
-
-### **🐺 Wolf Behavior (Population Control)**
-- **Conservative Reproduction**: Low reproduction rate (0.08) prevents wolf explosions
-- **High Energy Requirements**: Need 0.25 energy to reproduce (must hunt successfully)
-- **Strategic Hunting**: Target sheep within moderate hunting radius
-- **Energy Conservation**: Can survive 50+ steps without food
-- **Pack Dynamics**: Form packs for better hunting success and territorial control
-
-### **🌱 Grass Ecosystem**
-- **Seed Dispersal**: Mature grass spreads seeds within 2-cell radius
-- **Seasonal Growth**: Enhanced growth during spring/summer cycles
-- **Competition**: Dense areas experience reduced growth rates
-- **Recovery**: Regrows after grazing with realistic timescales
-
-## 🧬 **Reproduction System**
-
-### **Sheep Reproduction**
-- **Fertility Requirements**: 0.8+ energy, age 20-80 steps
-- **Mating**: Find partners within 3-cell proximity
-- **Pregnancy**: 25-step gestation with energy costs (0.4 total)
-- **Offspring**: 1-2 babies with inherited traits
-- **Cooldown**: 30 steps between pregnancies
-
-### **Wolf Reproduction**
-- **Pack Dynamics**: Only alpha pairs breed when pack size is 2-6
-- **High Energy Needs**: Requires 0.9+ energy (must be very well-fed)
-- **Territory**: Need 15-cell radius territory for breeding
-- **Gestation**: 15 steps with 2-4 offspring per litter
-- **Extended Cooldown**: 50 steps between litters for pack stability
-
-### **Grass Reproduction**
-- **Seed Production**: Mature grass (0.6+ density) produces seeds
-- **Dispersal Range**: Seeds spread within 2-cell radius
-- **Viability**: 70% chance seeds successfully establish
-- **Competition**: Nearby grass reduces spreading success
-
-## 📊 **Ecosystem Dynamics**
-
-### **Population Oscillation Phases**
-1. **🌱 Abundance Phase** (Steps 1-30): Grass flourishes, sheep multiply rapidly
-2. **🐺 Predation Phase** (Steps 30-60): Wolf population peaks, sheep decline
-3. **💀 Collapse Phase** (Steps 60-90): Wolves starve, predator population crashes
-4. **🔄 Recovery Phase** (Steps 90-120): Sheep recover, cycle repeats
-
-### **Stability Mechanisms**
-- **Carrying Capacity**: Environment limits maximum populations
-- **Energy Investment**: Reproduction requires significant energy reserves
-- **Genetic Diversity**: Trait variation prevents population bottlenecks
-- **Density Dependence**: Overcrowding reduces reproduction success
-- **Death Tracking**: Comprehensive logging of mortality causes
-
-## 🎮 **User Interface**
-
-### **Real-Time Visualization**
-- **Interactive Grid**: 50x50 cell world with organism visualization
-- **Population Charts**: Live graphs showing population trends over time
-- **Speed Control**: Adjustable simulation speed from slow observation to maximum
-- **Statistics Panel**: Real-time counts and ecosystem health metrics
-
-### **Analytics Dashboard**
-- **Population Graphs**: Historical trends with 100-step memory
-- **Biodiversity Index**: Species diversity and ecosystem health
-- **Stability Metrics**: Population variance and oscillation analysis
-- **Death Statistics**: Detailed mortality tracking by cause and type
-
-### **Interactive Controls**
-- **Play/Pause**: Start and stop simulation
-- **Step Mode**: Advance simulation one step at a time
-- **Reset**: Reinitialize ecosystem with default parameters
-- **Speed Presets**: Slow (0.5x), Normal (1x), Fast (2x), Max speed
-
-## 🏗️ **Architecture**
-
-### **Core Components**
-```
-SimulationEngine
-├── World (Grid management, statistics)
-├── StepProcessor (Organism behavior, movement)
-├── ReproductionProcessor (Breeding, genetics)
-└── Configuration (Ecological parameters)
-```
-
-### **Technology Stack**
-- **Frontend**: Next.js 15.5+, React, TypeScript
-- **State Management**: Redux with Autodux patterns
-- **Visualization**: Canvas rendering, Recharts for analytics
-- **Testing**: Vitest (unit), Playwright (E2E), Jest DOM
-- **Styling**: Tailwind CSS, CSS Modules
-
-### **Design Principles**
-- **Array-Oriented Programming**: Efficient batch processing
-- **Entity-Component System**: Modular organism behavior
-- **Immutable State**: Redux-based state management
-- **Test-Driven Development**: Comprehensive test coverage
-- **Ecological Accuracy**: Parameters based on real-world research
-
-## 🧪 **Testing Strategy**
-
-### **Unit Tests**
-- **Organism Behavior**: Movement, feeding, reproduction logic
-- **Population Dynamics**: Birth/death rates, energy management
-- **Ecosystem Balance**: Predator-prey relationships
-
-### **Integration Tests**
-- **Simulation Stability**: Long-term ecosystem survival
-- **Population Oscillations**: Realistic boom-bust cycles
-- **UI Components**: Visualization and user interaction
-
-### **End-to-End Tests**
-- **Browser Simulation**: Complete user workflows
-- **Performance**: Large population handling
-- **Headless Analysis**: Automated ecosystem studies
-
-## 🚀 **Getting Started**
-
-### **Prerequisites**
-- Node.js 18+
-- npm or yarn
-
-### **Installation**
 ```bash
-git clone <repository-url>
-cd ecol123
 npm install
+npm run dev            # http://localhost:3000
+npm test               # unit, rule, invariant and UI tests (fast)
+npm run test:ecology   # multi-seed ecology and robustness checks (~1.5 min)
+npx playwright test    # browser smoke test
 ```
 
-### **Development**
-```bash
-npm run dev          # Start development server
-npm run test         # Run unit tests
-npm run test:e2e     # Run Playwright tests
-npm run build        # Build for production
+In the page you can:
+- **Play/Pause** the run, or **Step** one step at a time.
+- Set the speed in steps per second.
+- See the current **Seed**. Type a seed and press **Reset** to replay that exact run, or press 🎲 to start a new one.
+
+## The model
+
+The world is an 80×80 grid that wraps at the edges. Distances are Chebyshev distances measured the short way round.
+
+- **Grass** is a value from 0 to 1 per cell. Every cell regrows by `grass.regrowth` each step, up to 1.
+- **Animals** each have energy (capped at the species' `maxEnergy`) and an age. A cell holds at most one sheep and at most one wolf. A sheep and a wolf may share a cell.
+
+Each step runs in this order:
+
+1. Grass regrows.
+2. **Sheep** act in shuffled order. Each sheep:
+   1. ages and pays `metabolism`, and dies of old age at `maxAge` or of starvation at zero energy;
+   2. moves one cell (or stays):
+      - if it can see a wolf within `vision`, it moves to the cell farthest from the nearest visible wolf;
+      - otherwise, with probability `wander`, it moves to a random cell;
+      - otherwise it moves to the grassiest cell;
+      - it never moves onto another sheep or a wolf;
+   3. eats up to `biteSize` grass, gaining `energyPerGrass` energy per unit eaten;
+   4. if its energy is at least `breedThreshold`, with probability `breedChance` it splits its energy with one lamb placed on a free neighbouring cell.
+3. **Wolves** act in shuffled order. Each wolf:
+   1. ages and pays `metabolism`, and dies the same two ways;
+   2. chases the nearest sheep within `vision`, up to `speed` cells, or wanders one cell if none is in sight;
+   3. kills an adjacent sheep with probability `catchChance`, gaining `energyPerSheep`;
+   4. breeds the same way as sheep, onto any wolf-free neighbouring cell.
+4. Dead animals are removed. Newborns act from the next step.
+
+The model is deterministic. All randomness comes from a seeded generator (`src/sim/rng.ts`), so a seed fully determines a run, and the core in `src/sim/` contains no `Math.random`, clock or logging.
+
+### Default parameters
+
+| | Default values |
+|---|---|
+| world | 80×80, grass regrowth 0.03 per step |
+| sheep | 400 initial; maxEnergy 10; metabolism 0.5; biteSize 0.5; energyPerGrass 2; breedThreshold 6; breedChance 0.08; vision 2; wander 0.2; maxAge 100 |
+| wolves | 20 initial; maxEnergy 30; metabolism 1.0; energyPerSheep 9; breedThreshold 18; breedChance 0.05; vision 3; speed 1; catchChance 0.22; maxAge 200 |
+
+These values were chosen by sweeping wolf parameters across many seeds. Wolves that are too strong overshoot, crash the sheep and starve; wolves that are too weak die out. The defaults sit in the middle of that window.
+
+## What the tests guarantee
+
+`npm test` covers:
+- **Each rule**, on small hand-built worlds. This includes a regression test that wolves chase the *truly* nearest sheep, not the first one in grid-scan order.
+- **Invariants after every step:** occupancy matches the animal lists, energy stays within (0, max], grass stays within [0, 1], and births minus deaths account for every population change.
+- **Determinism:** the same seed produces the same run.
+- **The UI:** a typed seed replays exactly the run a headless simulation produces.
+
+`npm run test:ecology` checks the model's purpose on the default config:
+- **Coexistence:** both species are alive after 3000 steps in at least 9 of 10 seeds.
+- **No sheep carpet:** sheep never exceed 30% of cells.
+- **Cycles:** at least 10 sheep population cycles per surviving run.
+- **Wolves follow sheep:** wolf peaks lag sheep peaks by more than 0 and less than half a cycle.
+- **Robustness:** with each of 8 key parameters scaled by ×0.8 or ×1.2, both species still coexist in at least 4 of 5 seeds.
+- **Speed:** 3000 steps run in under 3 seconds.
+
+The design and the reasoning behind it are in `docs/superpowers/specs/2026-11-03-simulation-core-design.md`.
+
+## Layout
+
+```
+src/sim/            the model: rng, config, grid, world, rules/, analysis
+src/visualization/  canvas grid, population chart, playback helpers
+src/app/            Next.js page
+tests/              Playwright smoke test
 ```
 
-### **Testing**
-```bash
-npm run test:watch     # Watch mode for unit tests
-npm run test:coverage  # Generate coverage report
-npm run test:e2e:ui    # Interactive E2E testing
-```
+## License
 
-## 📈 **Expected Behavior**
-
-### **Population Targets**
-- **Simulation Duration**: 150-200 steps consistently
-- **Oscillation Cycles**: Working towards 3-5 boom-bust cycles per 200 steps
-- **Sheep Population**: 50-200 individuals (cyclical booms and crashes)
-- **Wolf Population**: 10-25 individuals (responsive to sheep availability)
-- **Grass Coverage**: 2000-4000 patches (recovers during sheep crashes)
-
-### **Ecological Indicators**
-- **Biodiversity**: Consistently high with all species surviving
-- **Oscillation Period**: 40-60 step cycles
-- **Population Variance**: Moderate (healthy oscillations)
-- **Extinction Risk**: Low for all species long-term
-
-## 🔬 **Scientific Accuracy**
-
-### **Ecological Research Basis**
-- **Nutritional Stress Theory** (Bronson, 1989): Reproduction rates decrease with poor nutrition/energy
-- **Resource Allocation Theory** (Zera & Harshman, 2001): Energy trade-offs between survival and reproduction
-- **Life History Theory** (Stearns, 1992): Optimal reproductive strategies under resource constraints
-- **Lotka-Volterra Dynamics** (1925): Classic predator-prey oscillation mathematics
-- **Wolf Pack Dynamics**: Alpha breeding patterns from Yellowstone wolf studies (Mech, 1999)
-- **Sheep Reproduction**: Based on real sheep gestation (5 months → 25 steps)
-- **Energy Metabolism**: Accurate energy costs for survival and reproduction
-
-### **Dynamic Reproduction Mechanism**
-The simulation implements **energy-dependent reproductive success**:
-```
-Reproduction Rate = Base Rate × (Average Energy / Maximum Energy)
-```
-- **High Energy (0.8-1.0)**: 80-100% of base reproduction rate
-- **Medium Energy (0.4-0.8)**: 40-80% of base reproduction rate  
-- **Low Energy (0.1-0.4)**: 10-40% of base reproduction rate
-
-This creates natural **density-dependent regulation** where:
-- Abundant prey → Well-fed predators → Higher reproduction
-- Scarce prey → Hungry predators → Lower reproduction → Population decline
-
-### **Validation Metrics**
-- **Lotka-Volterra Compliance**: Matches theoretical predictions
-- **Field Study Comparison**: Aligns with real ecosystem observations
-- **Population Recovery**: Realistic bounce-back from near-extinction
-- **Reproductive Suppression**: Matches observed stress-induced fertility decline
-
-## 🎯 **Future Enhancements**
-
-### **Phase 2: Advanced Behaviors**
-- **Migration Patterns**: Seasonal movement behaviors
-- **Environmental Pressures**: Weather, disease, natural disasters
-- **Genetic Algorithms**: Evolution of traits over generations
-- **Multi-Species Expansion**: Additional trophic levels
-
-### **Phase 3: Ecosystem Complexity**
-- **Habitat Diversity**: Multiple biome types
-- **Resource Competition**: Water, shelter, territory
-- **Symbiotic Relationships**: Mutualism, commensalism
-- **Human Impact**: Conservation scenarios
-
-## 📚 **Educational Value**
-
-This simulation demonstrates key ecological concepts:
-- **Population Ecology**: Growth curves, carrying capacity
-- **Predator-Prey Dynamics**: Oscillations, stability
-- **Natural Selection**: Trait inheritance, fitness
-- **Ecosystem Services**: Producer-consumer relationships
-- **Conservation Biology**: Population viability, extinction risk
-
-Perfect for students, educators, and anyone interested in understanding the beautiful complexity of natural ecosystems! 🌍
-
-## 📄 **License**
-
-MIT License - See LICENSE file for details
-
-## 🤝 **Contributing**
-
-Contributions welcome! Please read our contributing guidelines and submit pull requests for any improvements.
-
----
-
-*Built with ❤️ for ecological education and scientific understanding*
+MIT
